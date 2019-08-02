@@ -1,0 +1,44 @@
+<idea-plugin>
+    <id>com.ggj.qa.plugin.TestCaseTemplate</id>
+    <name>TestCaseTemplate</name>
+    <version>1.0</version>
+    <vendor email="muyi@gegejia.com" url="http://www.xxxXXX.com">GGJ</vendor>
+
+    <description>Generate selected method test case template</description>
+
+    <change-notes>first note just for test try idea plugin dev</change-notes>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="173.0"/>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <group
+                id="com.ggj.qa.tools.group.TestCaseTemplateGroup"
+                class="com.ggj.qa.tools.group.TestCaseTemplateGroup"
+                popup="true"
+                text="GGJ Test Tools"
+                description="GGJ QA test case template generate tool">
+
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+
+            <!-- Add your actions here -->
+            <action id="com.ggj.qa.tools.group.actions.TestCaseTemplateAction"
+                    class="com.ggj.qa.tools.group.actions.TestCaseTemplateAction"
+                    popup="true"
+                    text="TestCaseTemplateGenerator"
+                    description="A test case template generate tool"/>
+        </group>
+
+    </actions>
+
+</idea-plugin>
