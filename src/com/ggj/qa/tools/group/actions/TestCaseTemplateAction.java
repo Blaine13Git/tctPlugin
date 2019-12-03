@@ -7,6 +7,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+
 public class TestCaseTemplateAction extends AnAction {
 
     @Override
@@ -36,10 +38,13 @@ public class TestCaseTemplateAction extends AnAction {
 
         // 文件路径
         PsiDirectory parent = file.getParent();
-//        System.out.println("文件路径：" + parent.getNavigationElement().toString());
 
-        String filePath = parent.getNavigationElement().toString().split(":")[1];
+        String filePath = parent.getNavigationElement().toString().split("PsiDirectory:")[1];
 //        System.out.println("filePath:" + filePath);
+
+        String[] split = parent.getNavigationElement().toString().split("PsiDirectory:");
+        System.out.println(split.length);
+        Arrays.stream(split).forEach(path -> System.out.println(path));
 
         PsiElement element = e.getData(CommonDataKeys.PSI_ELEMENT);
 //        System.out.println("element:" + element.getNavigationElement());
@@ -48,8 +53,7 @@ public class TestCaseTemplateAction extends AnAction {
         PsiFile psiFile = element.getContainingFile();
 //        System.out.println(psiFile.getName());
 
-
-
+        System.out.println("filePath >>> " + filePath);
         String fileName = selectedText.substring(0, 1).toUpperCase() + selectedText.substring(1);
         new TemplateOperate().generateCaseFile(filePath, fileName + "Test.java", element, project);
 

@@ -9,10 +9,7 @@ import com.intellij.psi.search.PsiShortNamesCache;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TemplateOperate {
@@ -52,6 +49,7 @@ public class TemplateOperate {
             System.out.println("所选内容无效，请选中类名或者方法名！");
         }
         testCaseFileName = fileName + "Test.java";
+        filePath.replace("\\", "/");
         testCaseFilePath = filePath.replace("/src/main/java/", "/src/test/java/") + "/";
         File testFilePath = new File(testCaseFilePath);
 
@@ -208,13 +206,22 @@ public class TemplateOperate {
         //写入开头
         String contentMethodStart = "\t@Test(dataProvider = \"CsvDataProvider\")\n" +
                 "\tpublic void " + requestMethodName + "CaseOfTest(" + methodParameters + ") {\n" +
-                "\t\tCASE_ID = getCaseId(caseId);";
+                "\t\tCASE_ID = getCaseId(caseId);" +
+                "try {";
         writeContent(filePath + fileName, contentMethodStart);
 
         //内容写入
         for (String content : contents) {
             writeContent(filePath + fileName, content);
         }
+
+        String model = "\t\t\tassertThat(result.getMessage() + \"\").isEqualTo(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
+                "        } catch (Exception e) {\n" +
+                "            assertThat(e.getMessage() + \"\").isEqualTo(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
+                "            e.printStackTrace();\n" +
+                "        }";
+        //写入经验模版
+        writeContent(filePath + fileName, model);
 
         //写入注释参数
         writeContent(filePath + fileName, parameterNames);
@@ -235,7 +242,10 @@ public class TemplateOperate {
         JvmParameter[] parameters = method.getParameters();
         for (JvmParameter parameter : parameters) {
             String parameterType = parameter.getType().toString().split(":")[1];//获取参数的类型
+            System.out.println("parameterType：" + parameterType);
+
             String parameterName = parameter.getName(); //获取参数的名称
+            System.out.println("parameterName：" + parameterName);
 
             if (parameterType.contains("List<")) {
                 //抽取范型
@@ -276,6 +286,9 @@ public class TemplateOperate {
                 parameterNames.append(parameterName);
                 parameterNameString.append(parameterName + ",");
 
+            } else if (parameterType.contains("Date")) {
+                String writeObjectString = "\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
+                contents.add(writeObjectString);
             } else {
                 CustomerObjectProcessor(parameterType, parameterName);
             }
