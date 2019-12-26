@@ -193,7 +193,7 @@ public class TemplateOperate {
         });
 
         String returnType = method.getReturnType().toString().split(":")[1];
-        String contentCallTemp = "\n\t\t" + returnType + " result = " + objectName + "." + requestMethodName + "(" + requestMethodParameters.toString() + ");";
+        String contentCallTemp = "\n\t\t\t" + returnType + " result = " + objectName + "." + requestMethodName + "(" + requestMethodParameters.toString() + ");";
         String contentCall = contentCallTemp.replace(",);", ");");
         contents.add(contentCall);
 
@@ -206,8 +206,8 @@ public class TemplateOperate {
         //写入开头
         String contentMethodStart = "\t@Test(dataProvider = \"CsvDataProvider\")\n" +
                 "\tpublic void " + requestMethodName + "CaseOfTest(" + methodParameters + ") {\n" +
-                "\t\tCASE_ID = getCaseId(caseId);" +
-                "try {";
+                "\t\tCASE_ID = getCaseId(caseId);\n" +
+                "\t\ttry {";
         writeContent(filePath + fileName, contentMethodStart);
 
         //内容写入
@@ -215,9 +215,9 @@ public class TemplateOperate {
             writeContent(filePath + fileName, content);
         }
 
-        String model = "\t\t\tassertThat(result.getMessage() + \"\").isEqualTo(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
+        String model = "\t\t\tassertThat(result.getMessage() + \"\").contains(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
                 "        } catch (Exception e) {\n" +
-                "            assertThat(e.getMessage() + \"\").isEqualTo(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
+                "            assertThat(e.getMessage() + \"\").contains(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
                 "            e.printStackTrace();\n" +
                 "        }";
         //写入经验模版
@@ -227,7 +227,7 @@ public class TemplateOperate {
         writeContent(filePath + fileName, parameterNames);
 
         //写入结尾
-        writeContent(filePath + fileName, "\t}");
+        writeContent(filePath + fileName, "\t}\n");
 
         //生成csv文件
         writeContent(filePath + fileName.split("java")[0] + requestMethodName + "CaseOfTest" + ".csv", parameterNames.substring(5));
@@ -242,27 +242,24 @@ public class TemplateOperate {
         JvmParameter[] parameters = method.getParameters();
         for (JvmParameter parameter : parameters) {
             String parameterType = parameter.getType().toString().split(":")[1];//获取参数的类型
-            System.out.println("parameterType：" + parameterType);
-
             String parameterName = parameter.getName(); //获取参数的名称
-            System.out.println("parameterName：" + parameterName);
 
             if (parameterType.contains("List<")) {
                 //抽取范型
                 String generics = parameterType.split("<")[1].split(">")[0];
-                if (generics.equals("String")) {
+                if (generics.equals("String") || generics.equals("Long") || generics.equals("Integer")) {
                     if (parameterNames.length() != 0) {
                         parameterNames.append(",");
                     }
-                    parameterType_NameString.append("String " + parameterName + ",");
+                    parameterType_NameString.append(generics + " " + parameterName + ",");
 
                     String parameterName2 = parameterName + "s";
-                    String writeListString = "\t\tArrayList<String> " + parameterName2 + " = new ArrayList<>();";
-                    String tempData = "\t\t" + parameterName2 + ".add(" + parameterName + ");";
+                    String writeListString = "\t\t\tArrayList<" + generics + "> " + parameterName2 + " = new ArrayList<>();";
+                    String tempData = "\t\t\t" + parameterName2 + ".add(" + parameterName + ");";
                     contents.add(writeListString);
                     contents.add(tempData);
 
-                    parameterNames.append(parameterName2);
+                    parameterNames.append(parameterName);
                     parameterNameString.append(parameterName + ",");
                 } else {
                     if (parameterNames.length() != 0) {
@@ -274,8 +271,8 @@ public class TemplateOperate {
 
                     //集合的处理
                     String parameterName2 = parameterName + "s";
-                    contents.add("\n\t\tArrayList<" + generics + "> " + parameterName2 + " = new ArrayList<>();");
-                    contents.add("\t\t" + parameterName2 + ".add(" + genericsParameterName + ");");
+                    contents.add("\n\t\t\tArrayList<" + generics + "> " + parameterName2 + " = new ArrayList<>();");
+                    contents.add("\t\t\t" + parameterName2 + ".add(" + genericsParameterName + ");");
                 }
 
             } else if (parameterType.equals("String") || parameterType.equals("int") || parameterType.equals("Integer") || parameterType.equals("Long") || parameterType.equals("long") || parameterType.equals("Boolean") || parameterType.equals("boolean")) {
@@ -287,7 +284,7 @@ public class TemplateOperate {
                 parameterNameString.append(parameterName + ",");
 
             } else if (parameterType.contains("Date")) {
-                String writeObjectString = "\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
+                String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
                 contents.add(writeObjectString);
             } else {
                 CustomerObjectProcessor(parameterType, parameterName);
@@ -306,19 +303,24 @@ public class TemplateOperate {
      * @param parameterName
      */
     private void CustomerObjectProcessor(String parameterType, String parameterName) {
-        String writeObjectString = "\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
+        String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
         contents.add(writeObjectString);
-        PsiClass[] parameterClass = PsiShortNamesCache.getInstance(project).getClassesByName(parameterType, GlobalSearchScope.allScope(project));
+        if (!parameterType.contains("[")) {
+            PsiClass[] parameterClass = PsiShortNamesCache.getInstance(project).getClassesByName(parameterType, GlobalSearchScope.allScope(project));
+            try {
+                List<PsiMethod> setParameterMethods = Arrays.stream(parameterClass[0].getAllMethods()).filter(parameterMethod -> parameterMethod.getName().startsWith("set")).collect(Collectors.toList());
+                for (PsiMethod setParameterMethod : setParameterMethods) {
+                    if (setParameterMethod.getParameters()[0].getType().toString().contains("List<")) {
+                        contents.add("\t\t\t" + parameterName + "." + setParameterMethod.getName() + "(" + setParameterMethod.getParameters()[0].getName() + "s);\n");
+                    } else {
+                        contents.add("\t\t\t" + parameterName + "." + setParameterMethod.getName() + "(" + setParameterMethod.getParameters()[0].getName() + ");\n");
+                    }
+                    getData(setParameterMethod);//调用方法的参数处理的方法
+                }
 
-        List<PsiMethod> setParameterMethods = Arrays.stream(parameterClass[0].getAllMethods()).filter(parameterMethod -> parameterMethod.getName().contains("set")).collect(Collectors.toList());
-        for (PsiMethod setParameterMethod : setParameterMethods) {
-            if (setParameterMethod.getParameters()[0].getType().toString().contains("List<")) {
-                contents.add("\t\t" + parameterName + "." + setParameterMethod.getName() + "(" + setParameterMethod.getParameters()[0].getName() + "s);");
-            } else {
-                contents.add("\t\t" + parameterName + "." + setParameterMethod.getName() + "(" + setParameterMethod.getParameters()[0].getName() + ");");
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            //调用方法的参数处理的方法
-            getData(setParameterMethod);
         }
         parameterNames.append(parameterName);
     }
