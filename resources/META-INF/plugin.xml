@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.ggj.qa.plugin.TestCaseTemplate</id>
     <name>TestCaseTemplate</name>
-    <version>1.1</version>
+    <version>1.2</version>
     <vendor email="muyi@gegejia.com" url="http://www.xxxXXX.com">GGJ</vendor>
 
     <description>Generate selected class or method test case template.</description>
@@ -37,6 +37,7 @@
                     popup="true"
                     text="TestCaseTemplateGenerator"
                     description="A test case template generate tool"/>
+
         </group>
 
     </actions>

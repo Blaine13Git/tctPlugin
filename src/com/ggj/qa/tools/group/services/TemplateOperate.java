@@ -49,9 +49,9 @@ public class TemplateOperate {
             System.out.println("所选内容无效，请选中类名或者方法名！");
         }
         testCaseFileName = fileName + "Test.java";
-        filePath.replace("\\", "/");
-        testCaseFilePath = filePath.replace("/src/main/java/", "/src/test/java/") + "/";
-        File testFilePath = new File(testCaseFilePath);
+//        filePath.replace("\\", "/");
+//        testCaseFilePath = filePath.replace("/src/main/java/", "/src/test/java/") + "/";
+        File testFilePath = new File(filePath);
 
         //判断路径是否存在
         if (!testFilePath.exists()) {
@@ -59,7 +59,7 @@ public class TemplateOperate {
         }
 
         //创建文件
-        String fullFileName = testCaseFilePath + testCaseFileName;
+        String fullFileName = filePath + testCaseFileName;
         File file = new File(fullFileName);
 
         //生成文件和基本信息
@@ -67,7 +67,7 @@ public class TemplateOperate {
             String importTest = "import org.testng.annotations.Test;\n";
             String importResource = "import javax.annotation.Resource;\n\n";
 
-            String packageNameTemp = testCaseFilePath.split("/src/test/java/")[1].replace("/", ".") + ";";
+            String packageNameTemp = filePath.split("/src/test/java/")[1].replace("/", ".") + ";";
             String packageName = packageNameTemp.replace(".;", ";");
             className = element.getContainingFile().getName().split("\\.")[0];
             objectName = className.substring(0, 1).toLowerCase() + className.substring(1);
@@ -78,10 +78,10 @@ public class TemplateOperate {
 
             //写入用例
             if (psiClass != null) {
-                writeTestCase(testCaseFilePath, testCaseFileName, psiClass, className);
+                writeTestCase(filePath, testCaseFileName, psiClass, className);
             }
             if (psiMethod != null) {
-                writeTestCase(testCaseFilePath, testCaseFileName, psiMethod, className);
+                writeTestCase(filePath, testCaseFileName, psiMethod, className);
             }
             System.out.println("测试用例文件生成完成：\n" + fullFileName);
 
@@ -285,6 +285,9 @@ public class TemplateOperate {
 
             } else if (parameterType.contains("Date")) {
                 String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
+                contents.add(writeObjectString);
+            } else if (parameterType.contains("HttpServletRequest") || parameterType.contains("HttpServletResponse")) {
+                String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = Mockito.mock(" + parameterType + ".class); ";
                 contents.add(writeObjectString);
             } else {
                 CustomerObjectProcessor(parameterType, parameterName);
