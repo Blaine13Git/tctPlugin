@@ -103,6 +103,7 @@ public class TemplateOperate {
             fw.write(content + "\n");
         } catch (Exception e) {
             System.out.println("文件写入失败！");
+            e.printStackTrace();
         }
     }
 
@@ -229,8 +230,18 @@ public class TemplateOperate {
         //写入结尾
         writeContent(filePath + fileName, "\t}\n");
 
+        String csvFilePath = filePath.split("/src/test/java/")[0] + "/src/test/resources/testdata/" + fileName.split(".java")[0] + "/";
+        System.out.println(">>>:" + csvFilePath);
+
+        File csvFilePathDir = new File(csvFilePath);
+        //判断路径是否存在
+        if (!csvFilePathDir.exists()) {
+            csvFilePathDir.mkdirs();
+        }
+
         //生成csv文件
-        writeContent(filePath + fileName.split("java")[0] + requestMethodName + "CaseOfTest" + ".csv", parameterNames.substring(5));
+        System.out.println("result:" + csvFilePath + fileName.split("java")[0] + requestMethodName + "CaseOfTest" + ".csv");
+        writeContent(csvFilePath + fileName.split("java")[0] + requestMethodName + "CaseOfTest" + ".csv", parameterNames.substring(5));
     }
 
     /**
