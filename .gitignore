@@ -22,6 +22,7 @@ target/
 .gradle/
 
 logs/
+out/
 #other
 /classes/
 *.log
