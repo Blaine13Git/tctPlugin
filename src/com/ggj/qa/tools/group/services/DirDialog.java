@@ -22,20 +22,12 @@ public class DirDialog extends DialogWrapper {
         init(); //触发一下init方法，否则swing样式将无法展示在会话框
     }
 
-
-/*    @Nullable
-    @Override
-    protected JComponent createNorthPanel() {
-        return dfs.initNorth();//返回位于会话框north位置的swing样式
-    }*/
-
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
         //定义表单的主题，放置到IDEA会话框的中央位置
         return dfs.initCenter();
     }
-
 
     @Override
     protected JComponent createSouthPanel() {
