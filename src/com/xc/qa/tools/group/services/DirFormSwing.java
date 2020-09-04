@@ -1,6 +1,5 @@
 package com.ggj.qa.tools.group.services;
 
-import com.intellij.ide.b.m.E;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 
