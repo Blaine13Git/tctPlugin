@@ -1,18 +1,18 @@
-package com.ggj.qa.tools.group.services;
+package com.xc.qa.tools.group.services;
 
 import com.intellij.lang.jvm.JvmParameter;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
+import com.xc.qa.tools.group.tools.TemplateTools;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.RandomAccessFile;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class TemplateOperate {
+public class TestCaseTemplateOperateService implements TemplateOperateService {
 
     private Project project = null;
     private PsiClass psiClass = null;
@@ -25,15 +25,18 @@ public class TemplateOperate {
     private StringBuilder parameterNameString = null;
     private ArrayList<String> contents = null;
 
+    private TemplateTools templateTools = new TemplateTools();
+
+
     /**
      * @param filePath，文件路径
      * @param fileName，文件名称（类名+Test or 方法名+Test）
      * @param element，选中的元素
+     * @author 慕一
      */
     public void generateCaseFile(String filePath, String fileName, PsiElement element, Project project) {
         this.project = project;
 
-        String testCaseFilePath;
         String testCaseFileName;
         String className;
 
@@ -61,10 +64,10 @@ public class TemplateOperate {
         //创建文件
         String fullFileName = filePath + testCaseFileName;
         File file = new File(fullFileName);
-
         //生成文件和基本信息
         if (!file.exists()) {
-            String importTest = "import org.testng.annotations.Test;\n";
+            String importTest = "import org.testng.annotations.Test;\n" +
+                    "import static com.google.common.truth.Truth.assertThat;\n";
             String importResource = "import javax.annotation.Resource;\n\n";
 
             String packageNameTemp = filePath.split("/src/test/java/")[1].replace("/", ".") + ";";
@@ -73,8 +76,8 @@ public class TemplateOperate {
             objectName = className.substring(0, 1).toLowerCase() + className.substring(1);
 
             //写入基本内容
-            writeContent(fullFileName, "package " + packageName + "\n\n" + importTest + importResource);
-            writeContent(fullFileName, "public class " + fileName + "Test extends BaseTest {\n\n\t@Resource\n\t" + className + " " + objectName + ";\n\n}");
+            templateTools.writeContent(fullFileName, "package " + packageName + "\n\n" + importTest + importResource);
+            templateTools.writeContent(fullFileName, "public class " + fileName + "Test extends BaseTest {\n\n\t@Resource\n\t" + className + " " + objectName + ";\n\n}");
 
             //写入用例
             if (psiClass != null) {
@@ -91,21 +94,6 @@ public class TemplateOperate {
         }
     }
 
-    /**
-     * 向文件中写入内容
-     *
-     * @param file
-     * @param content
-     * @author 慕一
-     */
-    private void writeContent(String file, String content) {
-        try (FileWriter fw = new FileWriter(file, true)) {
-            fw.write(content + "\n");
-        } catch (Exception e) {
-            System.out.println("文件写入失败！");
-            e.printStackTrace();
-        }
-    }
 
     /**
      * 删除文件最后一行
@@ -114,7 +102,7 @@ public class TemplateOperate {
      * @throws Exception
      * @author 慕一
      */
-    private static void deleteContent(String fileName) {
+    public static void deleteContent(String fileName) {
         RandomAccessFile randomAccessFile;
         try {
             randomAccessFile = new RandomAccessFile(fileName, "rw");
@@ -139,6 +127,7 @@ public class TemplateOperate {
      * @param fileName
      * @param element
      * @param className
+     * @author 慕一
      */
     public void writeTestCase(String filePath, String fileName, PsiElement element, String className) {
         String fullFileName = filePath + fileName;
@@ -160,7 +149,7 @@ public class TemplateOperate {
             e.printStackTrace();
         } finally {
             //写入类结尾
-            writeContent(fullFileName, "}");
+            templateTools.writeContent(fullFileName, "}");
         }
     }
 
@@ -209,11 +198,11 @@ public class TemplateOperate {
                 "\tpublic void " + requestMethodName + "CaseOfTest(" + methodParameters + ") {\n" +
                 "\t\tCASE_ID = getCaseId(caseId);\n" +
                 "\t\ttry {";
-        writeContent(filePath + fileName, contentMethodStart);
+        templateTools.writeContent(filePath + fileName, contentMethodStart);
 
         //内容写入
         for (String content : contents) {
-            writeContent(filePath + fileName, content);
+            templateTools.writeContent(filePath + fileName, content);
         }
 
         String model = "\t\t\tassertThat(result.getMessage() + \"\").contains(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
@@ -222,13 +211,13 @@ public class TemplateOperate {
                 "            e.printStackTrace();\n" +
                 "        }";
         //写入经验模版
-        writeContent(filePath + fileName, model);
+        templateTools.writeContent(filePath + fileName, model);
 
         //写入注释参数
-        writeContent(filePath + fileName, parameterNames);
+        templateTools.writeContent(filePath + fileName, parameterNames);
 
         //写入结尾
-        writeContent(filePath + fileName, "\t}\n");
+        templateTools.writeContent(filePath + fileName, "\t}\n");
 
         String csvFilePath = filePath.split("/src/test/java/")[0] + "/src/test/resources/testdata/" + fileName.split(".java")[0] + "/";
         System.out.println(">>>:" + csvFilePath);
@@ -241,7 +230,7 @@ public class TemplateOperate {
 
         //生成csv文件
         System.out.println("result:" + csvFilePath + fileName.split("java")[0] + requestMethodName + "CaseOfTest" + ".csv");
-        writeContent(csvFilePath + fileName.split("java")[0] + requestMethodName + "CaseOfTest" + ".csv", parameterNames.substring(5));
+        templateTools.writeContent(csvFilePath + fileName.split("java")[0] + requestMethodName + "CaseOfTest" + ".csv", parameterNames.substring(5));
     }
 
     /**
@@ -316,7 +305,7 @@ public class TemplateOperate {
      * @param parameterType
      * @param parameterName
      */
-    private void CustomerObjectProcessor(String parameterType, String parameterName) {
+    public void CustomerObjectProcessor(String parameterType, String parameterName) {
         String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
         contents.add(writeObjectString);
         if (!parameterType.contains("[")) {

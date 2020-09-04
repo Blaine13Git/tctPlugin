@@ -29,11 +29,18 @@
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
 
             <!-- Add your actions here -->
+            <action id="com.xc.qa.tools.group.actions.BaseTestTemplateAction"
+                    class="com.xc.qa.tools.group.actions.BaseTestTemplateAction"
+                    popup="true"
+                    text="BaseTestTemplateGenerator"
+                    description="Base test template generate tool"/>
+
             <action id="com.xc.qa.tools.group.actions.TestCaseTemplateAction"
                     class="com.xc.qa.tools.group.actions.TestCaseTemplateAction"
                     popup="true"
                     text="TestCaseTemplateGenerator"
                     description="A test case template generate tool"/>
+
         </group>
     </actions>
 </idea-plugin>

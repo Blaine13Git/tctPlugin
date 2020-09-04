@@ -1,16 +1,17 @@
-package com.ggj.qa.tools.group.actions;
+package com.xc.qa.tools.group.actions;
 
-import com.ggj.qa.tools.group.services.DirDialog;
-import com.ggj.qa.tools.group.services.DirFormSwing;
-import com.ggj.qa.tools.group.services.TemplateOperate;
+import com.xc.qa.tools.group.dialogs.TestCaseTemplateDialog;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-
+/**
+ * 生成 xxxTestCase.java
+ *
+ * @author muyi
+ * @Date
+ */
 public class TestCaseTemplateAction extends AnAction {
 
     @Override
@@ -60,8 +61,8 @@ public class TestCaseTemplateAction extends AnAction {
 //        new TemplateOperate().generateCaseFile(filePath, fileName + "Test.java", element, project);
 
         // 获取模版输出路径
-        DirDialog dirDialog = new DirDialog(e);
-        dirDialog.showAndGet();
+        TestCaseTemplateDialog testCaseTemplateDialog = new TestCaseTemplateDialog(e);
+        testCaseTemplateDialog.showAndGet();
 //        dirDialog.close(1);
     }
 
