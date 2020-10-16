@@ -32,8 +32,10 @@ public class BaseTestTemplateOperateService implements TemplateOperateService {
                     "import org.apache.commons.lang.StringUtils;\n" +
                     "import org.springframework.boot.test.context.SpringBootTest;\n" +
                     "import org.testng.annotations.Listeners;\n" +
+                    "import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;\n" +
                     "\n" +
                     "@SpringBootTest(classes = xxxApplication.class)\n" +
+                    "@AutoConfigureMockMvc" +
                     "@Listeners({ConfigReport.class})";
 
             String content = "static {\n" +

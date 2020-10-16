@@ -2,16 +2,26 @@ package com.xc.qa.tools.group.services;
 
 import com.intellij.lang.jvm.JvmParameter;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.xc.qa.tools.group.tools.TemplateTools;
 
 import java.io.File;
 import java.io.RandomAccessFile;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * by 慕一
+ * 生成集成测试用例模版
+ */
 public class TestCaseTemplateOperateService implements TemplateOperateService {
 
     private Project project = null;
@@ -39,59 +49,78 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         String testCaseFileName;
         String className;
+        String fullFileName = "";
 
-        //测试文件名称定义
-        if (element instanceof PsiClass) {
-            psiClass = (PsiClass) element.getNavigationElement();
-            fileName = psiClass.getName();
-        } else if (element instanceof PsiMethod) {
-            psiMethod = (PsiMethod) element.getNavigationElement();
-            String psiMethodName = psiMethod.getName();
-            fileName = psiMethodName.substring(0, 1).toUpperCase() + psiMethodName.substring(1);
-        } else {
-            System.out.println("所选内容无效，请选中类名或者方法名！");
-        }
-        testCaseFileName = fileName + "Test.java";
-//        filePath.replace("\\", "/");
-//        testCaseFilePath = filePath.replace("/src/main/java/", "/src/test/java/") + "/";
-        File testFilePath = new File(filePath);
+        try {
 
-        //判断路径是否存在
-        if (!testFilePath.exists()) {
-            testFilePath.mkdirs();
-        }
-
-        //创建文件
-        String fullFileName = filePath + testCaseFileName;
-        File file = new File(fullFileName);
-        //生成文件和基本信息
-        if (!file.exists()) {
-            String importTest = "import org.testng.annotations.Test;\n" +
-                    "import static com.google.common.truth.Truth.assertThat;\n";
-            String importResource = "import javax.annotation.Resource;\n\n";
-
-            String packageNameTemp = filePath.split("/src/test/java/")[1].replace("/", ".") + ";";
-            String packageName = packageNameTemp.replace(".;", ";");
-            className = element.getContainingFile().getName().split("\\.")[0];
-            objectName = className.substring(0, 1).toLowerCase() + className.substring(1);
-
-            //写入基本内容
-            templateTools.writeContent(fullFileName, "package " + packageName + "\n\n" + importTest + importResource);
-            templateTools.writeContent(fullFileName, "public class " + fileName + "Test extends BaseTest {\n\n\t@Resource\n\t" + className + " " + objectName + ";\n\n}");
-
-            //写入用例
-            if (psiClass != null) {
-                writeTestCase(filePath, testCaseFileName, psiClass, className);
+            //测试文件名称定义
+            if (element instanceof PsiClass) {
+                psiClass = (PsiClass) element.getNavigationElement();
+                fileName = psiClass.getName();
+            } else if (element instanceof PsiMethod) {
+                psiMethod = (PsiMethod) element.getNavigationElement();
+                String psiMethodName = psiMethod.getName();
+                fileName = psiMethodName.substring(0, 1).toUpperCase() + psiMethodName.substring(1);
             }
-            if (psiMethod != null) {
-                writeTestCase(filePath, testCaseFileName, psiMethod, className);
-            }
-            System.out.println("测试用例文件生成完成：\n" + fullFileName);
+            testCaseFileName = fileName + "Test.java";
+            File testFilePath = new File(filePath);
 
-        } else {
-            System.out.println("文件已经存在！");
-            System.out.println(file.getAbsolutePath());
+            //判断路径是否存在
+            if (!testFilePath.exists()) {
+                testFilePath.mkdirs();
+            }
+
+            //创建文件
+            fullFileName = filePath + testCaseFileName;
+            File file = new File(fullFileName);
+            //生成文件和基本信息
+            if (!file.exists()) {
+                String importTest = "import org.testng.annotations.Test;\n" +
+                        "import com.alibaba.fastjson.JSONObject;\n" +
+                        "import org.springframework.http.HttpHeaders;\n" +
+                        "import org.springframework.http.MediaType;\n" +
+                        "import javax.servlet.http.Cookie;\n" +
+                        "import org.springframework.util.MultiValueMap;\n" +
+                        "import org.springframework.test.web.servlet.MockMvc;\n" +
+                        "import org.springframework.beans.factory.annotation.Autowired;\n" +
+                        "import org.springframework.test.web.servlet.MvcResult;\n" +
+                        "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;\n" +
+                        "import static com.google.common.truth.Truth.assertThat;\n";
+                String importResource = "import javax.annotation.Resource;\n\n";
+
+                String packageNameTemp = filePath.split("/src/test/java/")[1].replace("/", ".") + ";";
+                String packageName = packageNameTemp.replace(".;", ";");
+                className = element.getContainingFile().getName().split("\\.")[0];
+                objectName = className.substring(0, 1).toLowerCase() + className.substring(1);
+
+                //写入基本内容
+                templateTools.writeContent(fullFileName, "package " + packageName + "\n\n" + importTest + importResource);
+
+                if (className.contains("Controller")) {
+                    templateTools.writeContent(fullFileName, "public class " + fileName + "Test extends BaseTest {\n" +
+                            "\n" +
+                            "\t@Autowired\n" +
+                            "\tprivate MockMvc mvc;\n\n}");
+                } else {
+                    templateTools.writeContent(fullFileName, "public class " + fileName + "Test extends BaseTest {\n" +
+                            "\n" +
+                            "\t@Autowired\n" +
+                            "\tprivate " + className + " " + objectName + ";\n");
+                }
+
+                //写入用例
+                if (psiClass != null) {
+                    writeTestCase(filePath, testCaseFileName, psiClass, className);
+                }
+                if (psiMethod != null) {
+                    writeTestCase(filePath, testCaseFileName, psiMethod, className);
+                }
+            }
+        } finally {
+            //写入类结尾
+            templateTools.writeContent(fullFileName, "}");
         }
+
     }
 
 
@@ -147,14 +176,11 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            //写入类结尾
-            templateTools.writeContent(fullFileName, "}");
         }
     }
 
     /**
-     * 创建测试方法都具体实现
+     * 创建测试方法的具体实现
      *
      * @param filePath
      * @param fileName
@@ -183,9 +209,18 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         });
 
         String returnType = method.getReturnType().toString().split(":")[1];
-        String contentCallTemp = "\n\t\t\t" + returnType + " result = " + objectName + "." + requestMethodName + "(" + requestMethodParameters.toString() + ");";
-        String contentCall = contentCallTemp.replace(",);", ");");
-        contents.add(contentCall);
+
+        boolean mapping = isMapping(method);
+        if (mapping) {
+            String contentCall = "\n\t\t\t" + "String result = JSONObject.toJSONString(mvcResult.getResponse());";
+            contents.add(contentCall);
+        } else {
+            String contentCallTemp = "\n\t\t\t" + returnType + " resultTemp = " + objectName + "." + requestMethodName + "(" + requestMethodParameters.toString() + ");";
+            String contentCall = contentCallTemp.replace(",);", ");");
+            String resultString = "\n\t\t\t" + "String result = JSONObject.toJSONString(resultTemp);";
+            contents.add(contentCall);
+            contents.add(resultString);
+        }
 
         String methodParameters = (String) data.get("parameters");
         methodParameters = methodParameters + "Boolean isSuccess";
@@ -205,12 +240,12 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             templateTools.writeContent(filePath + fileName, content);
         }
 
-        String model = "\t\t\tassertThat(result.getMessage() + \"\").contains(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
+        String model = "\t\t\tassertThat(result).contains(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
                 "        } catch (Exception e) {\n" +
                 "            assertThat(e.getMessage() + \"\").contains(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
                 "            e.printStackTrace();\n" +
                 "        }";
-        //写入经验模版
+        //写入校验模版
         templateTools.writeContent(filePath + fileName, model);
 
         //写入注释参数
@@ -220,7 +255,6 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         templateTools.writeContent(filePath + fileName, "\t}\n");
 
         String csvFilePath = filePath.split("/src/test/java/")[0] + "/src/test/resources/testdata/" + fileName.split(".java")[0] + "/";
-        System.out.println(">>>:" + csvFilePath);
 
         File csvFilePathDir = new File(csvFilePath);
         //判断路径是否存在
@@ -229,8 +263,21 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         }
 
         //生成csv文件
-        System.out.println("result:" + csvFilePath + fileName.split("java")[0] + requestMethodName + "CaseOfTest" + ".csv");
         templateTools.writeContent(csvFilePath + fileName.split("java")[0] + requestMethodName + "CaseOfTest" + ".csv", parameterNames.substring(5));
+    }
+
+    private boolean isMapping(PsiMethod method) {
+        PsiAnnotation[] annotations = method.getAnnotations();
+        List<PsiAnnotation> psiAnnotations = Arrays.stream(annotations).collect(Collectors.toList());
+        Boolean mapping = false;
+
+        for (int i = 0; i < psiAnnotations.size(); i++) {
+            if (psiAnnotations.get(i).getQualifiedName().endsWith("Mapping")) {
+                mapping = true;
+                break;
+            }
+        }
+        return mapping;
     }
 
     /**
@@ -240,6 +287,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      */
     public HashMap<String, Object> getData(PsiMethod method) {
         JvmParameter[] parameters = method.getParameters();
+        Boolean mapping = isMapping(method);
+
         for (JvmParameter parameter : parameters) {
             String parameterType = parameter.getType().toString().split(":")[1];//获取参数的类型
             String parameterName = parameter.getName(); //获取参数的名称
@@ -274,7 +323,6 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                     contents.add("\n\t\t\tArrayList<" + generics + "> " + parameterName2 + " = new ArrayList<>();");
                     contents.add("\t\t\t" + parameterName2 + ".add(" + genericsParameterName + ");");
                 }
-
             } else if (parameterType.equals("String") || parameterType.equals("int") || parameterType.equals("Integer") || parameterType.equals("Long") || parameterType.equals("long") || parameterType.equals("Boolean") || parameterType.equals("boolean")) {
                 if (parameterNames.length() != 0) {
                     parameterNames.append(",");
@@ -286,17 +334,44 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             } else if (parameterType.contains("Date")) {
                 String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
                 contents.add(writeObjectString);
-            } else if (parameterType.contains("HttpServletRequest") || parameterType.contains("HttpServletResponse")) {
-                String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = Mockito.mock(" + parameterType + ".class); ";
-                contents.add(writeObjectString);
+            } else if (parameterType.contains("HttpServletRequest") || parameterType.contains("HttpServletResponse") || parameterType.contains("Model")) {
+                // 不处理
             } else {
                 CustomerObjectProcessor(parameterType, parameterName);
+                if (isMapping(method)) {
+                    String jsonParam = "\t\t\t" + "String content = JSONObject.toJSONString(param);\n";
+                    contents.add(jsonParam);
+                }
             }
         }
+
+        if (mapping) {
+            mockMvcStringGenerate();
+        }
+
         data.put("parameters", parameterType_NameString.toString());
         data.put("contents", contents);
         data.put("parameterNames", parameterNameString.toString());
         return data;
+    }
+
+    private void mockMvcStringGenerate() {
+        String writeObjectString = "\t\t\t" + "HttpHeaders headers = new HttpHeaders();\n" +
+                "            headers.setContentType(MediaType.APPLICATION_JSON);\n" +
+                "\n" +
+                "            Cookie[] cookies = new Cookie[4];\n" +
+                "\n" +
+                "            MultiValueMap<String, String> params = new HttpHeaders();\n" +
+                "            params.add(\"\", \"\");\n" +
+                "\n" +
+                "            MvcResult mvcResult = mvc.perform(\n" +
+                "                    post(\"\")\n" +
+                "                            .headers(headers)\n" +
+                "                            .cookie(cookies)\n" +
+                "                            .params(params)\n" +
+                "                            .content(content)\n" +
+                "            ).andReturn();";
+        contents.add(writeObjectString);
     }
 
     /**
