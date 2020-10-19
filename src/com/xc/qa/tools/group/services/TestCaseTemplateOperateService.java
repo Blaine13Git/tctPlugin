@@ -1,11 +1,9 @@
 package com.xc.qa.tools.group.services;
 
+import com.intellij.lang.jvm.JvmAnnotation;
 import com.intellij.lang.jvm.JvmParameter;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiMethod;
+import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.xc.qa.tools.group.tools.TemplateTools;
@@ -28,6 +26,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
     private PsiClass psiClass = null;
     private PsiMethod psiMethod = null;
     private String objectName = null;
+
+    private boolean paramsNull = false;
 
     private HashMap<String, Object> data = null;
     private StringBuilder parameterType_NameString = null;
@@ -266,10 +266,16 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         templateTools.writeContent(csvFilePath + fileName.split("java")[0] + requestMethodName + "CaseOfTest" + ".csv", parameterNames.substring(5));
     }
 
+    /**
+     * Mapping method
+     *
+     * @param method
+     * @return
+     */
     private boolean isMapping(PsiMethod method) {
         PsiAnnotation[] annotations = method.getAnnotations();
         List<PsiAnnotation> psiAnnotations = Arrays.stream(annotations).collect(Collectors.toList());
-        Boolean mapping = false;
+        boolean mapping = false;
 
         for (int i = 0; i < psiAnnotations.size(); i++) {
             if (psiAnnotations.get(i).getQualifiedName().endsWith("Mapping")) {
@@ -278,6 +284,38 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             }
         }
         return mapping;
+    }
+
+
+    /**
+     * RequestBody param
+     *
+     * @param method
+     * @return
+     */
+
+
+    private boolean isRequestBody(PsiMethod method) {
+        boolean requestBody = false;
+
+        JvmParameter[] parameterList = method.getParameters();
+        List<JvmParameter> jvmParameters = Arrays.stream(parameterList).collect(Collectors.toList());
+        if (jvmParameters == null || jvmParameters.size() == 0) {
+            requestBody = true;
+            paramsNull = true;
+        } else {
+            for (int i = 0; i < jvmParameters.size(); i++) {
+                JvmAnnotation[] annotations = jvmParameters.get(i).getAnnotations();
+                List<JvmAnnotation> jvmAnnotations = Arrays.stream(annotations).collect(Collectors.toList());
+                for (int j = 0; j < jvmAnnotations.size(); j++) {
+                    jvmAnnotations.get(j).getQualifiedName().contains("RequestBody");
+                    requestBody = true;
+                    break;
+                }
+            }
+        }
+
+        return requestBody;
     }
 
     /**
@@ -339,14 +377,14 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             } else {
                 CustomerObjectProcessor(parameterType, parameterName);
                 if (isMapping(method)) {
-                    String jsonParam = "\t\t\t" + "String content = JSONObject.toJSONString(param);\n";
+                    String jsonParam = "\t\t\t" + "String content = JSONObject.toJSONString(" + parameterName + ");\n";
                     contents.add(jsonParam);
                 }
             }
         }
 
         if (mapping) {
-            mockMvcStringGenerate();
+            mockMvcStringGenerate(method);
         }
 
         data.put("parameters", parameterType_NameString.toString());
@@ -355,21 +393,36 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         return data;
     }
 
-    private void mockMvcStringGenerate() {
+    /**
+     * mock template
+     *
+     * @param method
+     */
+    private void mockMvcStringGenerate(PsiMethod method) {
+        String paramsString = "";
+        String showContent = "";
+        String showParams = "";
+
+        if (isRequestBody(method)) {
+            if (!paramsNull) {
+                showContent = "                            .content(content)\n";
+            }
+        } else {
+            paramsString = "" +
+                    "            MultiValueMap<String, String> params = new HttpHeaders();\n" +
+                    "            params.add(\"\", \"\");\n";
+            showParams = "                            .params(params)";
+        }
+
         String writeObjectString = "\t\t\t" + "HttpHeaders headers = new HttpHeaders();\n" +
                 "            headers.setContentType(MediaType.APPLICATION_JSON);\n" +
                 "\n" +
                 "            Cookie[] cookies = new Cookie[4];\n" +
                 "\n" +
-                "            MultiValueMap<String, String> params = new HttpHeaders();\n" +
-                "            params.add(\"\", \"\");\n" +
-                "\n" +
                 "            MvcResult mvcResult = mvc.perform(\n" +
                 "                    post(\"\")\n" +
                 "                            .headers(headers)\n" +
-                "                            .cookie(cookies)\n" +
-                "                            .params(params)\n" +
-                "                            .content(content)\n" +
+                "                            .cookie(cookies)\n" + paramsString + showParams + showContent +
                 "            ).andReturn();";
         contents.add(writeObjectString);
     }
