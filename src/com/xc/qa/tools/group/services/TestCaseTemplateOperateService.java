@@ -317,8 +317,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             } else if (parameterType.contains("Date") || parameterType.contains("LocalDateTime")) {
                 String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
                 contents.add(writeObjectString);
-            } else if (parameterType.contains("HttpServletRequest") || parameterType.contains("HttpServletResponse") || parameterType.contains("Model")) {
-                // 不处理
+            } else if (parameterType.contains("HttpServletRequest") || parameterType.contains("HttpServletResponse") || parameterType.contains("Model") || parameterType.contains("Map") || parameterType.contains("Set")) {
+                // 暂时不处理的参数类型
             } else {
                 CustomerObjectProcessor(parameterType, parameterName);
                 if (isMapping(method)) {
