@@ -51,76 +51,69 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         String className;
         String fullFileName = "";
 
-        try {
+        //测试文件名称定义
+        if (element instanceof PsiClass) {
+            psiClass = (PsiClass) element.getNavigationElement();
+            fileName = psiClass.getName();
+        } else if (element instanceof PsiMethod) {
+            psiMethod = (PsiMethod) element.getNavigationElement();
+            String psiMethodName = psiMethod.getName();
+            fileName = psiMethodName.substring(0, 1).toUpperCase() + psiMethodName.substring(1);
+        }
+        testCaseFileName = fileName + "Test.java";
+        File testFilePath = new File(filePath);
 
-            //测试文件名称定义
-            if (element instanceof PsiClass) {
-                psiClass = (PsiClass) element.getNavigationElement();
-                fileName = psiClass.getName();
-            } else if (element instanceof PsiMethod) {
-                psiMethod = (PsiMethod) element.getNavigationElement();
-                String psiMethodName = psiMethod.getName();
-                fileName = psiMethodName.substring(0, 1).toUpperCase() + psiMethodName.substring(1);
-            }
-            testCaseFileName = fileName + "Test.java";
-            File testFilePath = new File(filePath);
-
-            //判断路径是否存在
-            if (!testFilePath.exists()) {
-                testFilePath.mkdirs();
-            }
-
-            //创建文件
-            fullFileName = filePath + testCaseFileName;
-            File file = new File(fullFileName);
-            //生成文件和基本信息
-            if (!file.exists()) {
-                String importTest = "import org.testng.annotations.Test;\n" +
-                        "import com.alibaba.fastjson.JSONObject;\n" +
-                        "import org.springframework.http.HttpHeaders;\n" +
-                        "import org.springframework.http.MediaType;\n" +
-                        "import javax.servlet.http.Cookie;\n" +
-                        "import org.springframework.util.MultiValueMap;\n" +
-                        "import org.springframework.test.web.servlet.MockMvc;\n" +
-                        "import org.springframework.beans.factory.annotation.Autowired;\n" +
-                        "import org.springframework.test.web.servlet.MvcResult;\n" +
-                        "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;\n" +
-                        "import static com.google.common.truth.Truth.assertThat;\n";
-                String importResource = "import javax.annotation.Resource;\n\n";
-
-                String packageNameTemp = filePath.split("/src/test/java/")[1].replace("/", ".") + ";";
-                String packageName = packageNameTemp.replace(".;", ";");
-                className = element.getContainingFile().getName().split("\\.")[0];
-                objectName = className.substring(0, 1).toLowerCase() + className.substring(1);
-
-                //写入基本内容
-                templateTools.writeContent(fullFileName, "package " + packageName + "\n\n" + importTest + importResource);
-
-                if (className.contains("Controller")) {
-                    templateTools.writeContent(fullFileName, "public class " + fileName + "Test extends BaseTest {\n" +
-                            "\n" +
-                            "\t@Autowired\n" +
-                            "\tprivate MockMvc mvc;\n\n}");
-                } else {
-                    templateTools.writeContent(fullFileName, "public class " + fileName + "Test extends BaseTest {\n" +
-                            "\n" +
-                            "\t@Autowired\n" +
-                            "\tprivate " + className + " " + objectName + ";\n");
-                }
-
-                //写入用例
-                if (psiClass != null) {
-                    writeTestCase(filePath, testCaseFileName, psiClass, className);
-                }
-                if (psiMethod != null) {
-                    writeTestCase(filePath, testCaseFileName, psiMethod, className);
-                }
-            }
-        } finally {
-            //写入类结尾
-            templateTools.writeContent(fullFileName, "}");
+        //判断路径是否存在
+        if (!testFilePath.exists()) {
+            testFilePath.mkdirs();
         }
 
+        //创建文件
+        fullFileName = filePath + testCaseFileName;
+        File file = new File(fullFileName);
+        //生成文件和基本信息
+        if (!file.exists()) {
+            String importTest = "import org.testng.annotations.Test;\n" +
+                    "import com.alibaba.fastjson.JSONObject;\n" +
+                    "import org.springframework.http.HttpHeaders;\n" +
+                    "import org.springframework.http.MediaType;\n" +
+                    "import javax.servlet.http.Cookie;\n" +
+                    "import org.springframework.util.MultiValueMap;\n" +
+                    "import org.springframework.test.web.servlet.MockMvc;\n" +
+                    "import org.springframework.beans.factory.annotation.Autowired;\n" +
+                    "import org.springframework.test.web.servlet.MvcResult;\n" +
+                    "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;\n" +
+                    "import static com.google.common.truth.Truth.assertThat;\n";
+            String importResource = "import javax.annotation.Resource;\n\n";
+
+            String packageNameTemp = filePath.split("/src/test/java/")[1].replace("/", ".") + ";";
+            String packageName = packageNameTemp.replace(".;", ";");
+            className = element.getContainingFile().getName().split("\\.")[0];
+            objectName = className.substring(0, 1).toLowerCase() + className.substring(1);
+
+            //写入基本内容
+            templateTools.writeContent(fullFileName, "package " + packageName + "\n\n" + importTest + importResource);
+
+            if (className.contains("Controller")) {
+                templateTools.writeContent(fullFileName, "public class " + fileName + "Test extends BaseTest {\n" +
+                        "\n" +
+                        "\t@Autowired\n" +
+                        "\tprivate MockMvc mvc;\n\n}");
+            } else {
+                templateTools.writeContent(fullFileName, "public class " + fileName + "Test extends BaseTest {\n" +
+                        "\n" +
+                        "\t@Autowired\n" +
+                        "\tprivate " + className + " " + objectName + ";\n");
+            }
+
+            //写入用例
+            if (psiClass != null) {
+                writeTestCase(filePath, testCaseFileName, psiClass, className);
+            }
+            if (psiMethod != null) {
+                writeTestCase(filePath, testCaseFileName, psiMethod, className);
+            }
+        }
     }
 
 
@@ -176,7 +169,11 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            //写入类结尾
+            templateTools.writeContent(fullFileName, "}");
         }
+
     }
 
     /**
