@@ -2,9 +2,11 @@ package com.xc.qa.tools.group.services;
 
 import com.intellij.lang.jvm.JvmAnnotation;
 import com.intellij.lang.jvm.JvmParameter;
-import com.intellij.lang.jvm.types.JvmType;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.xc.qa.tools.group.tools.TemplateTools;
@@ -115,7 +117,6 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             }
         }
     }
-
 
     /**
      * 删除文件最后一行
