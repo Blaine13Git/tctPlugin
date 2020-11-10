@@ -2,6 +2,7 @@ package com.xc.qa.tools.group.services;
 
 import com.intellij.lang.jvm.JvmAnnotation;
 import com.intellij.lang.jvm.JvmParameter;
+import com.intellij.lang.jvm.annotation.JvmAnnotationAttribute;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiClass;
@@ -80,12 +81,12 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                     "import com.alibaba.fastjson.JSONObject;\n" +
                     "import org.springframework.http.HttpHeaders;\n" +
                     "import org.springframework.http.MediaType;\n" +
-                    "import javax.servlet.http.Cookie;\n" +
                     "import org.springframework.util.MultiValueMap;\n" +
                     "import org.springframework.test.web.servlet.MockMvc;\n" +
                     "import org.springframework.beans.factory.annotation.Autowired;\n" +
                     "import org.springframework.test.web.servlet.MvcResult;\n" +
                     "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;\n" +
+                    "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;\n" +
                     "import static com.google.common.truth.Truth.assertThat;\n\n";
 
             String packageNameTemp = filePath.split("/src/test/java/")[1].replace("/", ".") + ";";
@@ -193,7 +194,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         contents = new ArrayList<>();
 
         parameterType_NameString.append("String caseId,String caseDesc,");
-        parameterNameString.append("\t\t// caseId,caseDesc,");
+        parameterNameString.append("\t\t// caseId,caseDesc");
 
         String requestMethodName = method.getName();
         HashMap<String, Object> data = getData(method);
@@ -212,8 +213,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         String returnType = method.getReturnType().toString().split(":")[1];
 
-        boolean mapping = isMapping(method);
-        if (mapping) {
+        String requestMappingType = getRequestMappingType(method);
+        if (requestMappingType.equals("get") || requestMappingType.equals("post")) {
             String contentCall = "\n\t\t\t" + "String result = JSONObject.toJSONString(mvcResult.getResponse());";
             contents.add(contentCall);
         } else {
@@ -275,7 +276,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      */
     public HashMap<String, Object> getData(PsiMethod method) {
         JvmParameter[] parameters = method.getParameters();
-        Boolean mapping = isMapping(method);
+        String requestMappingType = getRequestMappingType(method);
 
         for (JvmParameter parameter : parameters) {
             String parameterType = parameter.getType().toString().split(":")[1];//获取参数的类型
@@ -339,14 +340,14 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 // 暂时不处理的参数类型
             } else {
                 CustomerObjectProcessor(parameterType, parameterName);
-                if (isMapping(method)) {
+                if (getRequestMappingType(method).contains("Mapping")) {
                     String jsonParam = "\t\t\t" + "String content = JSONObject.toJSONString(" + parameterName + ");\n";
                     contents.add(jsonParam);
                 }
             }
         }
 
-        if (mapping) {
+        if (requestMappingType.equals("get") || requestMappingType.equals("post")) {
             mockMvcStringGenerate(method);
         }
 
@@ -463,26 +464,26 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         String showContent = "";
         String showParams = "";
 
-        if (isRequestBody(method)) {
-            if (!paramsNull) {
-                showContent = "                            .content(content)\n";
-            }
-        } else {
+        String requestMappingType = getRequestMappingType(method);
+
+        if (getRequestParamType(method).equals("RequestBody")) {
+            showContent = "                            .content(content)\n";
+
+        }
+        if (getRequestParamType(method).equals("RequestParam")) {
             paramsString = "" +
-                    "            MultiValueMap<String, String> params = new HttpHeaders();\n" +
-                    "            params.add(\"\", \"\");\n";
+                    "\t\t\tMultiValueMap<String, String> params = new HttpHeaders();\n" +
+                    "\t\t\tparams.add(\"\", \"\");\n";
             showParams = "                            .params(params)";
         }
 
         String writeObjectString = "\t\t\t" + "HttpHeaders headers = new HttpHeaders();\n" +
-                "            headers.setContentType(MediaType.APPLICATION_JSON);\n" +
-                "\n" +
-                "            Cookie[] cookies = new Cookie[4];\n" +
-                "\n" +
+                "\t\t\theaders.setContentType(MediaType.APPLICATION_JSON);\n" +
+                "\t\t\theaders.add(\"token\", \"\");\n" +
+                "\n" + paramsString + "\n" +
                 "            MvcResult mvcResult = mvc.perform(\n" +
-                "                    post(\"\")\n" +
-                "                            .headers(headers)\n" +
-                "                            .cookie(cookies)\n" + paramsString + showParams + showContent +
+                "                    " + requestMappingType + "(\"\")\n" +
+                "                            .headers(headers)\n" + showParams + showContent +
                 "            ).andReturn();";
         contents.add(writeObjectString);
     }
@@ -493,18 +494,31 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      * @param method
      * @return
      */
-    private boolean isMapping(PsiMethod method) {
+    private String getRequestMappingType(PsiMethod method) {
+        String requestMappingType = "";
         PsiAnnotation[] annotations = method.getAnnotations();
         List<PsiAnnotation> psiAnnotations = Arrays.stream(annotations).collect(Collectors.toList());
-        boolean mapping = false;
 
         for (int i = 0; i < psiAnnotations.size(); i++) {
-            if (psiAnnotations.get(i).getQualifiedName().endsWith("Mapping")) {
-                mapping = true;
+            if (psiAnnotations.get(i).getQualifiedName().endsWith("GetMapping")) {
+                requestMappingType = "get";
+                break;
+            }
+            if (psiAnnotations.get(i).getQualifiedName().endsWith("PostMapping")) {
+                requestMappingType = "post";
+                break;
+            }
+            if (psiAnnotations.get(i).getQualifiedName().endsWith("RequestMapping")) {
+//                requestMappingType = "RequestMapping";
+                List<JvmAnnotationAttribute> attributes = psiAnnotations.get(i).getAttributes();
+                for (int j = 0; j < attributes.size(); j++) {
+                    contents.add(attributes.get(j).getAttributeName());
+                    contents.add(attributes.get(j).getAttributeValue().toString());
+                }
                 break;
             }
         }
-        return mapping;
+        return requestMappingType;
     }
 
     /**
@@ -513,27 +527,27 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      * @param method
      * @return
      */
-    private boolean isRequestBody(PsiMethod method) {
-        boolean requestBody = false;
+    private String getRequestParamType(PsiMethod method) {
+        String requestParamType = "";
 
         JvmParameter[] parameterList = method.getParameters();
         List<JvmParameter> jvmParameters = Arrays.stream(parameterList).collect(Collectors.toList());
         if (jvmParameters == null || jvmParameters.size() == 0) {
-            requestBody = true;
             paramsNull = true;
         } else {
             for (int i = 0; i < jvmParameters.size(); i++) {
                 JvmAnnotation[] annotations = jvmParameters.get(i).getAnnotations();
                 List<JvmAnnotation> jvmAnnotations = Arrays.stream(annotations).collect(Collectors.toList());
                 for (int j = 0; j < jvmAnnotations.size(); j++) {
-                    jvmAnnotations.get(j).getQualifiedName().contains("RequestBody");
-                    requestBody = true;
-                    break;
+                    if (jvmAnnotations.get(j).getQualifiedName().contains("RequestBody")) {
+                        requestParamType = "RequestBody";
+                    }
+                    if (jvmAnnotations.get(j).getQualifiedName().contains("RequestParam")) {
+                        requestParamType = "RequestParam";
+                    }
                 }
             }
         }
-
-        return requestBody;
+        return requestParamType;
     }
-
 }
