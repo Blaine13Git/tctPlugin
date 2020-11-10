@@ -4,10 +4,7 @@ import com.intellij.lang.jvm.JvmAnnotation;
 import com.intellij.lang.jvm.JvmParameter;
 import com.intellij.lang.jvm.annotation.JvmAnnotationAttribute;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiMethod;
+import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.xc.qa.tools.group.tools.TemplateTools;
@@ -196,7 +193,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         contents = new ArrayList<>();
 
         parameterType_NameString.append("String caseId,String caseDesc,");
-        parameterNameString.append("\t\t// caseId,caseDesc");
+        parameterNameString.append("\t\t// caseId,caseDesc,");
 
         String requestMethodName = method.getName();
         HashMap<String, Object> data = getData(method);
@@ -254,7 +251,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         templateTools.writeContent(filePath + fileName, model);
 
         // 写入注释参数
-        templateTools.writeContent(filePath + fileName, parameterNameString_end);
+        templateTools.writeContent(filePath + fileName, parameterNameString_end.replace(",,", ","));
 
         // 写入结尾
         templateTools.writeContent(filePath + fileName, "\t}\n");
@@ -342,7 +339,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 // 暂时不处理的参数类型
             } else {
                 CustomerObjectProcessor(parameterType, parameterName);
-                if (getRequestMappingType(method).contains("Mapping")) {
+                if (requestMappingType.equals("get") || requestMappingType.equals("post")) {
                     String jsonParam = "\t\t\t" + "String content = JSONObject.toJSONString(" + parameterName + ");\n";
                     contents.add(jsonParam);
                 }
@@ -466,24 +463,26 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         String showContent = "";
         String showParams = "";
 
-        if (isRequestBody(method)) {
-            if (!paramsNull) {
-                showContent = "                            .content(content)\n";
-            }
-        } else {
+        String requestMappingType = getRequestMappingType(method);
+
+        if (getRequestParamType(method).equals("RequestBody")) {
+            showContent = "                            .content(content)";
+
+        }
+        if (getRequestParamType(method).equals("RequestParam")) {
             paramsString = "" +
-                    "            MultiValueMap<String, String> params = new HttpHeaders();\n" +
-                    "            params.add(\"\", \"\");\n";
+                    "\t\t\tMultiValueMap<String, String> params = new HttpHeaders();\n" +
+                    "\t\t\tparams.add(\"\", \"\");\n\n";
             showParams = "                            .params(params)";
         }
 
         String writeObjectString = "\t\t\t" + "HttpHeaders headers = new HttpHeaders();\n" +
                 "\t\t\theaders.setContentType(MediaType.APPLICATION_JSON);\n" +
                 "\t\t\theaders.add(\"token\", \"\");\n" +
-                "\n" + paramsString + "\n" +
+                "\n" + paramsString +
                 "            MvcResult mvcResult = mvc.perform(\n" +
                 "                    " + requestMappingType + "(\"\")\n" +
-                "                            .headers(headers)\n" + showParams + showContent +
+                "                            .headers(headers)\n" + showParams + showContent + "\n" +
                 "            ).andReturn();";
         contents.add(writeObjectString);
     }
@@ -495,7 +494,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      * @return
      */
     private String getRequestMappingType(PsiMethod method) {
-        String requestMappingType = "";
+        String requestMappingType = "post";
         PsiAnnotation[] annotations = method.getAnnotations();
         List<PsiAnnotation> psiAnnotations = Arrays.stream(annotations).collect(Collectors.toList());
 
@@ -509,13 +508,13 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 break;
             }
             if (psiAnnotations.get(i).getQualifiedName().endsWith("RequestMapping")) {
-//                requestMappingType = "RequestMapping";
-                List<JvmAnnotationAttribute> attributes = psiAnnotations.get(i).getAttributes();
-                for (int j = 0; j < attributes.size(); j++) {
-                    contents.add(attributes.get(j).getAttributeName());
-                    contents.add(attributes.get(j).getAttributeValue().toString());
+                PsiAnnotationMemberValue method1 = psiAnnotations.get(i).findAttributeValue("method");
+                if (method1.getText().contains("POST")) {
+                    requestMappingType = "post";
                 }
-                break;
+                if (method1.getText().contains("GET")) {
+                    requestMappingType = "get";
+                }
             }
         }
         return requestMappingType;

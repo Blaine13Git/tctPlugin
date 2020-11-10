@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.xc.qa.plugin.TestCaseTemplate</id>
     <name>TestCaseTemplate</name>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
     <vendor email="fengchang@xinc818.com" url="http://www.xxxXXX.com">xinc</vendor>
     <description>Generate selected class or method test case template.</description>
     <change-notes>first note just for interface test case generate</change-notes>
