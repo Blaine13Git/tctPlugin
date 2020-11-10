@@ -1,11 +1,9 @@
 <idea-plugin>
-    <id>com.ggj.qa.plugin.TestCaseTemplate</id>
+    <id>com.xc.qa.plugin.TestCaseTemplate</id>
     <name>TestCaseTemplate</name>
-    <version>1.2</version>
-    <vendor email="muyi@gegejia.com" url="http://www.xxxXXX.com">GGJ</vendor>
-
+    <version>2.1.0</version>
+    <vendor email="fengchang@xinc818.com" url="http://www.xxxXXX.com">xinc</vendor>
     <description>Generate selected class or method test case template.</description>
-
     <change-notes>first note just for interface test case generate</change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
@@ -23,23 +21,26 @@
 
     <actions>
         <group
-                id="com.ggj.qa.tools.group.TestCaseTemplateGroup"
-                class="com.ggj.qa.tools.group.TestCaseTemplateGroup"
+                id="com.xc.qa.tools.group.TestCaseTemplateGroup"
+                class="com.xc.qa.tools.group.TestCaseTemplateGroup"
                 popup="true"
-                text="GGJ Test Tools"
+                text="XC Test Tools"
                 description="GGJ QA test case template generate tool">
-
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
 
             <!-- Add your actions here -->
-            <action id="com.ggj.qa.tools.group.actions.TestCaseTemplateAction"
-                    class="com.ggj.qa.tools.group.actions.TestCaseTemplateAction"
+            <action id="com.xc.qa.tools.group.actions.BaseTestTemplateAction"
+                    class="com.xc.qa.tools.group.actions.BaseTestTemplateAction"
+                    popup="true"
+                    text="BaseTestTemplateGenerator"
+                    description="Base test template generate tool"/>
+
+            <action id="com.xc.qa.tools.group.actions.TestCaseTemplateAction"
+                    class="com.xc.qa.tools.group.actions.TestCaseTemplateAction"
                     popup="true"
                     text="TestCaseTemplateGenerator"
                     description="A test case template generate tool"/>
 
         </group>
-
     </actions>
-
 </idea-plugin>

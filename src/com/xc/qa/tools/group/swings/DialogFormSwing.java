@@ -1,14 +1,16 @@
-package com.ggj.qa.tools.group.services;
+package com.xc.qa.tools.group.swings;
 
-import com.intellij.ide.b.m.E;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.xc.qa.tools.group.services.BaseTestTemplateOperateService;
+import com.xc.qa.tools.group.services.TemplateOperateService;
+import com.xc.qa.tools.group.services.TestCaseTemplateOperateService;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 
-public class DirFormSwing {
+public class DialogFormSwing {
+
     public String directory;
     private JPanel north = new JPanel();
     private JPanel center = new JPanel();
@@ -35,7 +37,7 @@ public class DirFormSwing {
 
         center.setLayout(new GridLayout(4, 1));
 
-        JLabel tips = new JLabel("e.g.: /.../src/test/java/packageName/");
+        JLabel tips = new JLabel("e.g.: /.../src/test/java/packageName");
         tips.setFont(new Font("微软雅黑", Font.PLAIN, 10)); //字体样式
 
         result = new JLabel("Result: ……");
@@ -45,7 +47,6 @@ public class DirFormSwing {
         center.add(directoryContent);
         center.add(tips);
         center.add(result);
-
 
         return center;
     }
@@ -59,21 +60,20 @@ public class DirFormSwing {
         // 按钮事件绑定
         submit.addActionListener(e -> {
             //获取输入的路径
-            directory = directoryContent.getText();
-            System.out.println("test input directory:" + directory);
-            System.out.println("projectName:" + project.getName());
-            System.out.println("fileName:" + fileName);
-            System.out.println("element:" + element.getNavigationElement());
-
+            directory = directoryContent.getText() + "/";
             try {
-                // 调用模版生成的方法
-                new TemplateOperate().generateCaseFile(directory, fileName + "Test.java", element, project);
+                if ("BaseTest".equals(fileName)) {
+                    // 调用BaseTest模版生成的方法
+                    new BaseTestTemplateOperateService().generateBaseTestFile(directory, fileName + ".java", element, project);
+                } else {
+                    // 调用TestCase模版生成的方法
+                    new TestCaseTemplateOperateService().generateCaseFile(directory, fileName + "Test.java", element, project);
+                }
                 result.setText("Succeed");
             } catch (Exception exception) {
                 result.setText("Failed");
                 exception.printStackTrace();
             }
-            System.out.println("OK！");
         });
 
         return south;

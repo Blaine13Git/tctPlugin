@@ -33,3 +33,5 @@ rebel-remote.xml
 
 consumer/
 log.path_IS_UNDEFINED/
+
+*.class
