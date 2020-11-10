@@ -32,6 +32,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
     private String objectName = null;
 
     private boolean paramsNull = false;
+    private boolean requestBody = false;
+    private boolean requestParam = false;
 
     private HashMap<String, Object> data = null;
     private StringBuilder parameterNames = null;
@@ -53,7 +55,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         String testCaseFileName;
         String className;
-        String fullFileName = "";
+        String fullFileName;
 
         //测试文件名称定义
         if (element instanceof PsiClass) {
@@ -227,8 +229,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         String methodParameters = (String) data.get("parameters");
         methodParameters = methodParameters + "Boolean isSuccess";
-        String parameterNames = (String) data.get("parameterNames");
-        parameterNames = parameterNames + "isSuccess";
+        String parameterNameString_end = (String) data.get("parameterNameString");
+        parameterNameString_end = parameterNameString_end + "isSuccess";
         ArrayList<String> contents = (ArrayList<String>) data.get("contents");
 
         //写入开头
@@ -251,22 +253,22 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         //写入校验模版
         templateTools.writeContent(filePath + fileName, model);
 
-        //写入注释参数
-        templateTools.writeContent(filePath + fileName, parameterNames);
+        // 写入注释参数
+        templateTools.writeContent(filePath + fileName, parameterNameString_end);
 
-        //写入结尾
+        // 写入结尾
         templateTools.writeContent(filePath + fileName, "\t}\n");
 
         String csvFilePath = filePath.split("/src/test/java/")[0] + "/src/test/resources/testdata/" + fileName.split(".java")[0] + "/";
 
         File csvFilePathDir = new File(csvFilePath);
-        //判断路径是否存在
+        // 判断路径是否存在
         if (!csvFilePathDir.exists()) {
             csvFilePathDir.mkdirs();
         }
 
-        //生成csv文件
-        templateTools.writeContent(csvFilePath + fileName.split("java")[0] + requestMethodName + "CaseOfTest" + ".csv", parameterNames.substring(5));
+        // 生成csv文件
+        templateTools.writeContent(csvFilePath + fileName.split("java")[0] + requestMethodName + "CaseOfTest" + ".csv", parameterNameString_end.replace("//", "").trim());
     }
 
     /**
@@ -353,7 +355,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         data.put("parameters", parameterType_NameString.toString());
         data.put("contents", contents);
-        data.put("parameterNames", parameterNameString.toString());
+        data.put("parameterNameString", parameterNameString.toString());
         return data;
     }
 
@@ -379,8 +381,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                     String setParameterMethodName = setParameterMethod.getParameters()[0].getName();
 
                     if (setParameterMethodType.contains("List<")) {
-                        contents.add("\t\t\t" + parameterName + "." + setParameterMethod.getName() + "(" + setParameterMethodName + setParameterMethodType2 + "s);");
                         getData(setParameterMethod); // 调用方法的参数处理的方法
+                        contents.add("\t\t\t" + parameterName + "." + setParameterMethod.getName() + "(" + setParameterMethodName + setParameterMethodType2 + "s);");
                     } else {
                         JvmParameter[] setMethodParameters = setParameterMethod.getParameters();
                         String setMethodParameter0Type = setMethodParameters[0].getType().toString().split(":")[1];
@@ -464,16 +466,14 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         String showContent = "";
         String showParams = "";
 
-        String requestMappingType = getRequestMappingType(method);
-
-        if (getRequestParamType(method).equals("RequestBody")) {
-            showContent = "                            .content(content)\n";
-
-        }
-        if (getRequestParamType(method).equals("RequestParam")) {
+        if (isRequestBody(method)) {
+            if (!paramsNull) {
+                showContent = "                            .content(content)\n";
+            }
+        } else {
             paramsString = "" +
-                    "\t\t\tMultiValueMap<String, String> params = new HttpHeaders();\n" +
-                    "\t\t\tparams.add(\"\", \"\");\n";
+                    "            MultiValueMap<String, String> params = new HttpHeaders();\n" +
+                    "            params.add(\"\", \"\");\n";
             showParams = "                            .params(params)";
         }
 
@@ -522,7 +522,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
     }
 
     /**
-     * RequestBody param
+     * rest param resolve
      *
      * @param method
      * @return
