@@ -6,6 +6,10 @@ import com.xc.qa.tools.group.tools.TemplateTools;
 
 import java.io.File;
 
+/**
+ * by 慕一
+ * 生成BaseTest模版
+ */
 public class BaseTestTemplateOperateService implements TemplateOperateService {
 
     public void generateBaseTestFile(String filePath, String fileName, PsiElement element, Project project) {

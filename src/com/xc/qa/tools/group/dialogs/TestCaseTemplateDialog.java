@@ -37,7 +37,6 @@ public class TestCaseTemplateDialog extends DialogWrapper {
         return dfs.initCenter();
     }
 
-
     @Override
     protected JComponent createSouthPanel() {
         // 项目信息

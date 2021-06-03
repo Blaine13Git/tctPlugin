@@ -2,7 +2,6 @@ package com.xc.qa.tools.group.services;
 
 import com.intellij.lang.jvm.JvmAnnotation;
 import com.intellij.lang.jvm.JvmParameter;
-import com.intellij.lang.jvm.annotation.JvmAnnotationAttribute;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -29,8 +28,6 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
     private String objectName = null;
 
     private boolean paramsNull = false;
-    private boolean requestBody = false;
-    private boolean requestParam = false;
 
     private HashMap<String, Object> data = null;
     private StringBuilder parameterNames = null;
@@ -86,6 +83,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                     "import org.springframework.test.web.servlet.MvcResult;\n" +
                     "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;\n" +
                     "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;\n" +
+                    "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;\n" +
                     "import static com.google.common.truth.Truth.assertThat;\n\n";
 
             String packageNameTemp = filePath.split("/src/test/java/")[1].replace("/", ".") + ";";
@@ -185,6 +183,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      * @param fileName
      * @param method
      */
+    String requestMethodNameOriginal = "";
+
     public void writeMethodProcessor(String filePath, String fileName, PsiMethod method) {
         data = new HashMap<>();
         parameterType_NameString = new StringBuilder();
@@ -195,7 +195,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         parameterType_NameString.append("String caseId,String caseDesc,");
         parameterNameString.append("\t\t// caseId,caseDesc,");
 
-        String requestMethodName = method.getName();
+        requestMethodNameOriginal = method.getName();
         HashMap<String, Object> data = getData(method);
 
         StringBuilder requestMethodParameters = new StringBuilder();
@@ -213,11 +213,12 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         String returnType = method.getReturnType().toString().split(":")[1];
 
         String requestMappingType = getRequestMappingType(method);
-        if (requestMappingType.equals("get") || requestMappingType.equals("post")) {
-            String contentCall = "\n\t\t\t" + "String result = JSONObject.toJSONString(mvcResult.getResponse());";
+
+        if (requestMappingType.equals("get") || requestMappingType.equals("post") || requestMappingType.equals("put") || requestMappingType.equals("delete")) {
+            String contentCall = "\n\t\t\t" + "String result = JSONObject.toJSONString(mvcResult.getResponse().getContentAsString());";
             contents.add(contentCall);
         } else {
-            String contentCallTemp = "\n\t\t\t" + returnType + " resultTemp = " + objectName + "." + requestMethodName + "(" + requestMethodParameters.toString() + ");";
+            String contentCallTemp = "\n\t\t\t" + returnType + " resultTemp = " + objectName + "." + requestMethodNameOriginal + "(" + requestMethodParameters.toString() + ");";
             String contentCall = contentCallTemp.replace(",);", ");");
             String resultString = "\n\t\t\t" + "String result = JSONObject.toJSONString(resultTemp);";
             contents.add(contentCall);
@@ -232,7 +233,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         //写入开头
         String contentMethodStart = "\t@Test(dataProvider = \"CsvDataProvider\")\n" +
-                "\tpublic void " + requestMethodName + "CaseOfTest(" + methodParameters + ") {\n" +
+                "\tpublic void " + requestMethodNameOriginal + "CaseOfTest(" + methodParameters + ") {\n" +
                 "\t\tCASE_ID = getCaseId(caseId);\n" +
                 "\t\ttry {";
         templateTools.writeContent(filePath + fileName, contentMethodStart);
@@ -244,8 +245,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         String model = "\t\t\tassertThat(result).contains(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
                 "        } catch (Exception e) {\n" +
-                "            assertThat(e.getMessage() + \"\").contains(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
                 "            e.printStackTrace();\n" +
+                "            assertThat(e.getMessage() + \"\").contains(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
                 "        }";
         //写入校验模版
         templateTools.writeContent(filePath + fileName, model);
@@ -257,7 +258,6 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         templateTools.writeContent(filePath + fileName, "\t}\n");
 
         String csvFilePath = filePath.split("/src/test/java/")[0] + "/src/test/resources/testdata/" + fileName.split(".java")[0] + "/";
-
         File csvFilePathDir = new File(csvFilePath);
         // 判断路径是否存在
         if (!csvFilePathDir.exists()) {
@@ -265,7 +265,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         }
 
         // 生成csv文件
-        templateTools.writeContent(csvFilePath + fileName.split("java")[0] + requestMethodName + "CaseOfTest" + ".csv", parameterNameString_end.replace("//", "").trim());
+        templateTools.writeContent(csvFilePath + fileName.split("java")[0] + requestMethodNameOriginal + "CaseOfTest" + ".csv", parameterNameString_end.replace("//", "").trim());
     }
 
     /**
@@ -294,13 +294,11 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
                     // 需要去重
                     parameterType_NameStringAppend(generics, parameterName);
-
                     String parameterName2 = parameterName + "s";
                     String writeListString = "\t\t\tArrayList<" + generics + "> " + parameterName2 + " = new ArrayList<>();";
                     String tempData = "\t\t\t" + parameterName2 + ".add(" + parameterName + ");";
                     contents.add(writeListString);
                     contents.add(tempData);
-
                     parameterNames.append(parameterName);
                     parameterNameStringAppend(parameterName);
                 } else {
@@ -322,7 +320,6 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 }
                 // 需要去重
                 parameterType_NameStringAppend(parameterType, parameterName);
-
                 parameterNames.append(parameterName);
                 parameterNameStringAppend(parameterName);
             } else if (parameterType.equals("Date")) {
@@ -339,14 +336,15 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 // 暂时不处理的参数类型
             } else {
                 CustomerObjectProcessor(parameterType, parameterName);
-                if (requestMappingType.equals("get") || requestMappingType.equals("post")) {
+                if (parameterNameOriginal.equals(parameterName) && (requestMappingType.equals("get") || requestMappingType.equals("post") || requestMappingType.equals("put") || requestMappingType.equals("delete"))) {
                     String jsonParam = "\t\t\t" + "String content = JSONObject.toJSONString(" + parameterName + ");\n";
                     contents.add(jsonParam);
                 }
             }
         }
 
-        if (requestMappingType.equals("get") || requestMappingType.equals("post")) {
+        String requestMethodName = method.getName();
+        if (requestMethodNameOriginal.equals(requestMethodName) && (requestMappingType.equals("get") || requestMappingType.equals("post") || requestMappingType.equals("put") || requestMappingType.equals("delete"))) {
             mockMvcStringGenerate(method);
         }
 
@@ -362,7 +360,16 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      * @param parameterType
      * @param parameterName
      */
+    int times = 0;
+    String parameterNameOriginal = "";
+
     public void CustomerObjectProcessor(String parameterType, String parameterName) {
+
+        if (times < 1) {
+            times++;
+            parameterNameOriginal = parameterName;
+        }
+
         String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
         contents.add(writeObjectString);
         if (!parameterType.contains("[")) {
@@ -466,14 +473,14 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         String requestMappingType = getRequestMappingType(method);
 
         if (getRequestParamType(method).equals("RequestBody")) {
-            showContent = "                            .content(content)";
+            showContent = "                            .content(content)\n";
 
         }
         if (getRequestParamType(method).equals("RequestParam")) {
             paramsString = "" +
                     "\t\t\tMultiValueMap<String, String> params = new HttpHeaders();\n" +
                     "\t\t\tparams.add(\"\", \"\");\n\n";
-            showParams = "                            .params(params)";
+            showParams = "                            .params(params)\n";
         }
 
         String writeObjectString = "\t\t\t" + "HttpHeaders headers = new HttpHeaders();\n" +
@@ -482,7 +489,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 "\n" + paramsString +
                 "            MvcResult mvcResult = mvc.perform(\n" +
                 "                    " + requestMappingType + "(\"\")\n" +
-                "                            .headers(headers)\n" + showParams + showContent + "\n" +
+                "                            .headers(headers)\n" + showParams + showContent +
                 "            ).andReturn();";
         contents.add(writeObjectString);
     }
@@ -494,7 +501,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      * @return
      */
     private String getRequestMappingType(PsiMethod method) {
-        String requestMappingType = "post";
+        String requestMappingType = "";
         PsiAnnotation[] annotations = method.getAnnotations();
         List<PsiAnnotation> psiAnnotations = Arrays.stream(annotations).collect(Collectors.toList());
 
@@ -511,9 +518,19 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 PsiAnnotationMemberValue method1 = psiAnnotations.get(i).findAttributeValue("method");
                 if (method1.getText().contains("POST")) {
                     requestMappingType = "post";
+                    break;
                 }
                 if (method1.getText().contains("GET")) {
                     requestMappingType = "get";
+                    break;
+                }
+                if (method1.getText().contains("PUT")) {
+                    requestMappingType = "put";
+                    break;
+                }
+                if (method1.getText().contains("DELETE")) {
+                    requestMappingType = "delete";
+                    break;
                 }
             }
         }
@@ -536,6 +553,10 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         } else {
             for (int i = 0; i < jvmParameters.size(); i++) {
                 JvmAnnotation[] annotations = jvmParameters.get(i).getAnnotations();
+                if (annotations == null) {
+                    requestParamType = "RequestParam";
+                    continue;
+                }
                 List<JvmAnnotation> jvmAnnotations = Arrays.stream(annotations).collect(Collectors.toList());
                 for (int j = 0; j < jvmAnnotations.size(); j++) {
                     if (jvmAnnotations.get(j).getQualifiedName().contains("RequestBody")) {
