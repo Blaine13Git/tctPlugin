@@ -2,7 +2,6 @@ package com.xc.qa.tools.group.services;
 
 import com.intellij.lang.jvm.JvmAnnotation;
 import com.intellij.lang.jvm.JvmParameter;
-import com.intellij.lang.jvm.annotation.JvmAnnotationAttribute;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -29,8 +28,6 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
     private String objectName = null;
 
     private boolean paramsNull = false;
-    private boolean requestBody = false;
-    private boolean requestParam = false;
 
     private HashMap<String, Object> data = null;
     private StringBuilder parameterNames = null;
@@ -86,6 +83,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                     "import org.springframework.test.web.servlet.MvcResult;\n" +
                     "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;\n" +
                     "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;\n" +
+                    "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;\n" +
                     "import static com.google.common.truth.Truth.assertThat;\n\n";
 
             String packageNameTemp = filePath.split("/src/test/java/")[1].replace("/", ".") + ";";
@@ -215,8 +213,9 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         String returnType = method.getReturnType().toString().split(":")[1];
 
         String requestMappingType = getRequestMappingType(method);
-        if (requestMappingType.equals("get") || requestMappingType.equals("post")) {
-            String contentCall = "\n\t\t\t" + "String result = JSONObject.toJSONString(mvcResult.getResponse());";
+
+        if (requestMappingType.equals("get") || requestMappingType.equals("post") || requestMappingType.equals("put") || requestMappingType.equals("delete")) {
+            String contentCall = "\n\t\t\t" + "String result = JSONObject.toJSONString(mvcResult.getResponse().getContentAsString());";
             contents.add(contentCall);
         } else {
             String contentCallTemp = "\n\t\t\t" + returnType + " resultTemp = " + objectName + "." + requestMethodNameOriginal + "(" + requestMethodParameters.toString() + ");";
@@ -246,8 +245,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         String model = "\t\t\tassertThat(result).contains(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
                 "        } catch (Exception e) {\n" +
-                "            assertThat(e.getMessage() + \"\").contains(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
                 "            e.printStackTrace();\n" +
+                "            assertThat(e.getMessage() + \"\").contains(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
                 "        }";
         //写入校验模版
         templateTools.writeContent(filePath + fileName, model);
@@ -337,7 +336,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 // 暂时不处理的参数类型
             } else {
                 CustomerObjectProcessor(parameterType, parameterName);
-                if (parameterNameOriginal.equals(parameterName) && (requestMappingType.equals("get") || requestMappingType.equals("post"))) {
+                if (parameterNameOriginal.equals(parameterName) && (requestMappingType.equals("get") || requestMappingType.equals("post") || requestMappingType.equals("put") || requestMappingType.equals("delete"))) {
                     String jsonParam = "\t\t\t" + "String content = JSONObject.toJSONString(" + parameterName + ");\n";
                     contents.add(jsonParam);
                 }
@@ -345,7 +344,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         }
 
         String requestMethodName = method.getName();
-        if (requestMethodNameOriginal.equals(requestMethodName) && (requestMappingType.equals("get") || requestMappingType.equals("post"))) {
+        if (requestMethodNameOriginal.equals(requestMethodName) && (requestMappingType.equals("get") || requestMappingType.equals("post") || requestMappingType.equals("put") || requestMappingType.equals("delete"))) {
             mockMvcStringGenerate(method);
         }
 
@@ -502,7 +501,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      * @return
      */
     private String getRequestMappingType(PsiMethod method) {
-        String requestMappingType = "post";
+        String requestMappingType = "";
         PsiAnnotation[] annotations = method.getAnnotations();
         List<PsiAnnotation> psiAnnotations = Arrays.stream(annotations).collect(Collectors.toList());
 
@@ -523,6 +522,14 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 }
                 if (method1.getText().contains("GET")) {
                     requestMappingType = "get";
+                    break;
+                }
+                if (method1.getText().contains("PUT")) {
+                    requestMappingType = "put";
+                    break;
+                }
+                if (method1.getText().contains("DELETE")) {
+                    requestMappingType = "delete";
                     break;
                 }
             }
@@ -546,6 +553,10 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         } else {
             for (int i = 0; i < jvmParameters.size(); i++) {
                 JvmAnnotation[] annotations = jvmParameters.get(i).getAnnotations();
+                if (annotations == null) {
+                    requestParamType = "RequestParam";
+                    continue;
+                }
                 List<JvmAnnotation> jvmAnnotations = Arrays.stream(annotations).collect(Collectors.toList());
                 for (int j = 0; j < jvmAnnotations.size(); j++) {
                     if (jvmAnnotations.get(j).getQualifiedName().contains("RequestBody")) {

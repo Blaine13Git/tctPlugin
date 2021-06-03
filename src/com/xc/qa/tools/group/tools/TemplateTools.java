@@ -1,6 +1,9 @@
 package com.xc.qa.tools.group.tools;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.nio.channels.FileChannel;
 
 public class TemplateTools {
     /**
@@ -11,8 +14,12 @@ public class TemplateTools {
      * @author 慕一
      */
     public void writeContent(String file, String content) {
-        try (FileWriter fw = new FileWriter(file, true)) {
-            fw.write(content + "\n");
+        try (FileOutputStream fs = new FileOutputStream(file, true)) {
+            fs.write((content + "\n").getBytes());
+            FileChannel channel = fs.getChannel();
+            channel.force(true);
+            fs.getFD().sync();
+            channel.close();
         } catch (Exception e) {
             System.out.println("文件写入失败！");
             e.printStackTrace();

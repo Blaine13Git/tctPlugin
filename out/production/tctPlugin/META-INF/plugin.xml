@@ -1,8 +1,8 @@
 <idea-plugin>
     <id>com.xc.qa.plugin.TestCaseTemplate</id>
     <name>TestCaseTemplate</name>
-    <version>2.1.1</version>
-    <vendor email="fengchang@xinc818.com" url="http://www.xxxXXX.com">xinc</vendor>
+    <version>2.2.2</version>
+    <vendor email="fengchang@xinc818.com" url="http://www.xxxXXX.com">xc</vendor>
     <description>Generate selected class or method test case template.</description>
     <change-notes>first note just for interface test case generate</change-notes>
 
@@ -25,7 +25,7 @@
                 class="com.xc.qa.tools.group.TestCaseTemplateGroup"
                 popup="true"
                 text="XC Test Tools"
-                description="xinc QA test case template generate tool">
+                description="XC QA test case template generate tool">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
 
             <!-- Add your actions here -->

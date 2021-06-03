@@ -3,11 +3,12 @@ package com.xc.qa.tools.group.swings;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.xc.qa.tools.group.services.BaseTestTemplateOperateService;
-import com.xc.qa.tools.group.services.TemplateOperateService;
 import com.xc.qa.tools.group.services.TestCaseTemplateOperateService;
 
 import javax.swing.*;
 import java.awt.*;
+
+//import com.intellij.openapi.editor.Editor;
 
 public class DialogFormSwing {
 
@@ -78,4 +79,5 @@ public class DialogFormSwing {
 
         return south;
     }
+
 }

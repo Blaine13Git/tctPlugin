@@ -1,10 +1,21 @@
 package com.xc.qa.tools.group.actions;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.CommandProcessor;
+import com.intellij.openapi.editor.Document;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.xc.qa.tools.group.dialogs.TestCaseTemplateDialog;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.regex.Pattern;
 
 /**
  * 生成 xxxTestCase.java
@@ -14,11 +25,13 @@ import org.jetbrains.annotations.NotNull;
  */
 public class TestCaseTemplateAction extends AnAction {
 
+    static Pattern NEW_LINE = Pattern.compile("\\r\\n?", Pattern.DOTALL);
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
 
         //项目信息
-//        Project project = e.getProject();
+        final Project project = e.getProject();
 //        System.out.println("项目名称：" + project.getName());
 //        System.out.println("项目路径：" + project.getBasePath());
 
