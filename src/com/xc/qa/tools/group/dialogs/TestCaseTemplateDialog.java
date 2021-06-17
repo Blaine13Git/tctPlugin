@@ -53,4 +53,8 @@ public class TestCaseTemplateDialog extends DialogWrapper {
 
         return dfs.initSouth(fileName, element, project); //不需要展示SouthPanel要重写返回null，否则IDEA将展示默认的"Cancel"和"OK"按钮
     }
+    @Override
+    public JComponent getPreferredFocusedComponent() {
+        return dfs.directoryContent;
+    }
 }
