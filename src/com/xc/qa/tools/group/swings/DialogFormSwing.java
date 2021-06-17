@@ -13,13 +13,13 @@ import java.awt.*;
 public class DialogFormSwing {
 
     public String directory;
-    private JPanel north = new JPanel();
-    private JPanel center = new JPanel();
-    private JPanel south = new JPanel();
+    public JPanel north = new JPanel();
+    public JPanel center = new JPanel();
+    public JPanel south = new JPanel();
 
 
-    private JTextField directoryContent;
-    private JLabel result;
+    public JTextField directoryContent;
+    public JLabel result;
 
 /*    public JPanel initNorth() {
         //定义表单的标题部分，放置到IDEA会话框的顶部位置
@@ -34,6 +34,7 @@ public class DialogFormSwing {
     public JPanel initCenter() {
         JLabel labelName = new JLabel("Directory(Absolute Path):");
         labelName.setPreferredSize(new Dimension(600, 40));
+
         directoryContent = new JTextField();
 
         center.setLayout(new GridLayout(4, 1));
