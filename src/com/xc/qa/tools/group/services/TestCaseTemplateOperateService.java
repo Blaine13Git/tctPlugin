@@ -105,10 +105,14 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                     "import com.alibaba.fastjson.JSONObject;\n" +
                     "import org.springframework.http.HttpHeaders;\n" +
                     "import org.springframework.http.MediaType;\n" +
+                    "import com.vip8.iam.context.IamContext;\n"+
+                    "import com.vip8.iam.web.filter.IamFilter;\n"+
                     "import org.springframework.util.MultiValueMap;\n" +
                     "import org.springframework.test.web.servlet.MockMvc;\n" +
-                    "import org.springframework.beans.factory.annotation.Autowired;\n" +
                     "import org.springframework.test.web.servlet.MvcResult;\n" +
+                    "import org.springframework.beans.factory.annotation.Autowired;\n" +
+                    "import org.springframework.web.context.WebApplicationContext;\n"+
+                    "import org.springframework.test.web.servlet.setup.MockMvcBuilders;\n"+
                     "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;\n" +
                     "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;\n" +
                     "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;\n" +
@@ -127,6 +131,10 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                         "\n" +
                         "\t@Autowired\n" +
                         "\tprivate MockMvc mvc;\n\n" +
+                        "\t@Autowired\n" +
+                        "\tprivate WebApplicationContext webApplicationContext;\n\n" +
+                        "\t@Autowired\n" +
+                        "\tprivate IamContext iamContext;\n\n" +
                         "\t@Reference\n" +
                         "\tprivate TokenToolsApi tokenToolsApi;\n\n");
             } else {
@@ -261,14 +269,15 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         parameterNameString_end = parameterNameString_end + "isSuccess";
         ArrayList<String> contents = (ArrayList<String>) data.get("contents");
 
-        //写入开头
+        // 写入开头
         String contentMethodStart = "\t@Test(dataProvider = \"CsvDataProvider\")\n" +
                 "\tpublic void " + requestMethodNameOriginal + "CaseOfTest(" + methodParameters + ") {\n" +
                 "\t\tCASE_ID = getCaseId(caseId);\n" +
+                "\t\tmvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).addFilter(new IamFilter(iamContext), \"/*\").build();\n\n"+
                 "\t\ttry {";
         templateTools.writeContent(filePath + fileName, contentMethodStart);
 
-        //内容写入
+        // 内容写入
         for (String content : contents) {
             templateTools.writeContent(filePath + fileName, content);
         }
@@ -278,7 +287,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 "            e.printStackTrace();\n" +
                 "            assertThat(e.getMessage() + \"\").contains(caseDesc.substring(caseDesc.lastIndexOf(\"-\") + 1));\n" +
                 "        }";
-        //写入校验模版
+        // 写入校验模版
         templateTools.writeContent(filePath + fileName, model);
 
         // 写入注释参数
@@ -534,6 +543,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         String writeObjectString = "\t\t\t" + "HttpHeaders headers = new HttpHeaders();\n" +
                 "\t\t\theaders.setContentType(MediaType.APPLICATION_JSON);\n" +
+                "\t\t\theaders.add(\"app-code\", \"SUPPLY\");\n" +
                 "\t\t\theaders.add(\"token\", tokenToolsApi.getServerTokenByLoginName(\"test123\"));\n" +
                 "\n" + paramsString +
                 "\n\t\t\tMvcResult mvcResult = mvc.perform(\n" +
