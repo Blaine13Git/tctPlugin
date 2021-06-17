@@ -105,14 +105,14 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                     "import com.alibaba.fastjson.JSONObject;\n" +
                     "import org.springframework.http.HttpHeaders;\n" +
                     "import org.springframework.http.MediaType;\n" +
-                    "import com.vip8.iam.context.IamContext;\n"+
-                    "import com.vip8.iam.web.filter.IamFilter;\n"+
+                    "import com.vip8.iam.context.IamContext;\n" +
+                    "import com.vip8.iam.web.filter.IamFilter;\n" +
                     "import org.springframework.util.MultiValueMap;\n" +
                     "import org.springframework.test.web.servlet.MockMvc;\n" +
                     "import org.springframework.test.web.servlet.MvcResult;\n" +
                     "import org.springframework.beans.factory.annotation.Autowired;\n" +
-                    "import org.springframework.web.context.WebApplicationContext;\n"+
-                    "import org.springframework.test.web.servlet.setup.MockMvcBuilders;\n"+
+                    "import org.springframework.web.context.WebApplicationContext;\n" +
+                    "import org.springframework.test.web.servlet.setup.MockMvcBuilders;\n" +
                     "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;\n" +
                     "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;\n" +
                     "import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;\n" +
@@ -273,7 +273,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         String contentMethodStart = "\t@Test(dataProvider = \"CsvDataProvider\")\n" +
                 "\tpublic void " + requestMethodNameOriginal + "CaseOfTest(" + methodParameters + ") {\n" +
                 "\t\tCASE_ID = getCaseId(caseId);\n" +
-                "\t\tmvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).addFilter(new IamFilter(iamContext), \"/*\").build();\n\n"+
+                "\t\tmvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).addFilter(new IamFilter(iamContext), \"/*\").build();\n\n" +
                 "\t\ttry {";
         templateTools.writeContent(filePath + fileName, contentMethodStart);
 
@@ -322,75 +322,91 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             mockMvcString = mockMvcStringGenerate(method);
         }
 
-        for (JvmParameter parameter : parameters) {
-            String parameterType = parameter.getType().toString().split(":")[1];//获取参数的类型
+        if ("".equals(getRequestMappingType(method))) {
+            // 普通接口
+            for (JvmParameter parameter : parameters) {
+                String parameterType = parameter.getType().toString().split(":")[1];//获取参数的类型
 
-            String parameterType1 = parameterType.replace("<", "");
-            String parameterType2 = parameterType1.replace(">", "");
-            String parameterName = parameter.getName() + parameterType2; //获取参数的名称+类型确认唯一性
+                String parameterType1 = parameterType.replace("<", "");
+                String parameterType2 = parameterType1.replace(">", "");
+                String parameterName = parameter.getName() + parameterType2; //获取参数的名称+类型确认唯一性
 
-            if (parameterType.contains("List<")) {
-                // 抽取范型
-                String generics = parameterType.split("<")[1].split(">")[0];
-                if (generics.equals("String") || generics.equals("Long") || generics.equals("Integer")) {
+                if (parameterType.contains("List<")) {// 范型
+                    String generics = parameterType.split("<")[1].split(">")[0];
+                    if (generics.equals("String") || generics.equals("Long") || generics.equals("Integer")) {
+                        if (parameterNames.length() != 0) {
+                            parameterNames.append(",");
+                        }
+
+                        // 需要去重
+                        parameterType_NameStringAppend(generics, parameterName);
+                        String parameterName2 = parameterName + "s";
+                        String writeListString = "\t\t\tArrayList<" + generics + "> " + parameterName2 + " = new ArrayList<>();";
+                        String tempData = "\t\t\t" + parameterName2 + ".add(" + parameterName + ");";
+                        contents.add(writeListString);
+                        contents.add(tempData);
+                        parameterNames.append(parameterName);
+                        parameterNameStringAppend(parameterName);
+                    } else {
+                        if (parameterNames.length() != 0) {
+                            parameterNames.append(",");
+                        }
+                        // 范型的对象处理
+                        String genericsParameterName = generics.substring(0, 1).toLowerCase() + generics.substring(1);
+                        CustomerObjectProcessor(generics, genericsParameterName);
+
+                        // 集合的处理
+                        String parameterName2 = parameterName + "s";
+                        contents.add("\n\t\t\tArrayList<" + generics + "> " + parameterName2 + " = new ArrayList<>();");
+                        contents.add("\t\t\t" + parameterName2 + ".add(" + genericsParameterName + ");");
+                    }
+                } else if (isBaseDataType(parameterType)) { // 基础数据类型
                     if (parameterNames.length() != 0) {
                         parameterNames.append(",");
                     }
-
                     // 需要去重
-                    parameterType_NameStringAppend(generics, parameterName);
-                    String parameterName2 = parameterName + "s";
-                    String writeListString = "\t\t\tArrayList<" + generics + "> " + parameterName2 + " = new ArrayList<>();";
-                    String tempData = "\t\t\t" + parameterName2 + ".add(" + parameterName + ");";
-                    contents.add(writeListString);
-                    contents.add(tempData);
+                    parameterType_NameStringAppend(parameterType, parameterName);
                     parameterNames.append(parameterName);
                     parameterNameStringAppend(parameterName);
-                } else {
-                    if (parameterNames.length() != 0) {
-                        parameterNames.append(",");
-                    }
-                    // 范型的对象处理
-                    String genericsParameterName = generics.substring(0, 1).toLowerCase() + generics.substring(1);
-                    CustomerObjectProcessor(generics, genericsParameterName);
-
-                    // 集合的处理
-                    String parameterName2 = parameterName + "s";
-                    contents.add("\n\t\t\tArrayList<" + generics + "> " + parameterName2 + " = new ArrayList<>();");
-                    contents.add("\t\t\t" + parameterName2 + ".add(" + genericsParameterName + ");");
-                }
-            } else if (isBaseDataType(parameterType)) {
-                if (parameterNames.length() != 0) {
-                    parameterNames.append(",");
-                }
-                // 需要去重
-                parameterType_NameStringAppend(parameterType, parameterName);
-                parameterNames.append(parameterName);
-                parameterNameStringAppend(parameterName);
-            } else if (parameterType.equals("Date")) {
-                String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
-                contents.add(writeObjectString);
-            } else if (parameterType.equals("BigDecimal")) {
-                contents.add("\t\t\t// BigDecimal 类型需要自己给一个String类型参数");
-                String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "(818);";
-                contents.add(writeObjectString);
-            } else if (parameterType.equals("LocalDateTime")) {
-                String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = " + parameterType + ".now();";
-                contents.add(writeObjectString);
-            } else if (parameterType.equals("HttpServletRequest") || parameterType.equals("HttpServletResponse") || parameterType.equals("Model") || parameterType.equals("Map") || parameterType.equals("Set")) {
-                // 暂时不处理的参数类型
-            } else {
-                if (!"RequestParam".equals(getRequestParamType(method))) {
+                } else if (parameterType.equals("Date")) {
+                    String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
+                    contents.add(writeObjectString);
+                } else if (parameterType.equals("BigDecimal")) {
+                    contents.add("\t\t\t// BigDecimal 类型需要自己给一个String类型参数");
+                    String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "(818);";
+                    contents.add(writeObjectString);
+                } else if (parameterType.equals("LocalDateTime")) {
+                    String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = " + parameterType + ".now();";
+                    contents.add(writeObjectString);
+                } else if (parameterType.equals("HttpServletRequest") || parameterType.equals("HttpServletResponse") || parameterType.equals("Model") || parameterType.equals("Map") || parameterType.equals("Set")) {
+                    // 暂时不处理的参数类型
+                } else { // 自定义类型
                     CustomerObjectProcessor(parameterType, parameterName);
                 }
-
-                if (parameterNameOriginal.equals(parameterName) && ("RequestBody" == getRequestParamType(method)) && (requestMappingType.equals("get") || requestMappingType.equals("post") || requestMappingType.equals("put") || requestMappingType.equals("delete"))) {
-                    String jsonParam = "\n\t\t\t" + "String content = JSONObject.toJSONString(" + parameterName + ");\n";
-                    contents.add(jsonParam);
-                }
-
-                contents.add(mockMvcString);
             }
+        } else {
+            // rest 接口
+            for (JvmParameter parameter : parameters) {
+                String parameterType = parameter.getType().toString().split(":")[1];//获取参数的类型
+
+                String parameterType1 = parameterType.replace("<", "");
+                String parameterType2 = parameterType1.replace(">", "");
+                String parameterName = parameter.getName() + parameterType2; //获取参数的名称+类型确认唯一性
+
+                if (isBaseDataType(parameterType)) {
+                    parameterType_NameStringAppend(parameterType, parameterName);
+                    parameterNameStringAppend(parameterName);
+                } else {
+                    if (!"RequestParam".equals(getRequestParamType(method))) {
+                        CustomerObjectProcessor(parameterType, parameterName);
+                    }
+                    if (parameterNameOriginal.equals(parameterName) && ("RequestBody" == getRequestParamType(method)) && (requestMappingType.equals("get") || requestMappingType.equals("post") || requestMappingType.equals("put") || requestMappingType.equals("delete"))) {
+                        String jsonParam = "\n\t\t\t" + "String content = JSONObject.toJSONString(" + parameterName + ");\n";
+                        contents.add(jsonParam);
+                    }
+                }
+            }
+            contents.add(mockMvcString);
         }
 
         data.put("parameters", parameterType_NameString.toString());
@@ -526,16 +542,24 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             JvmParameter[] parameters = method.getParameters();
             for (JvmParameter parameter : parameters) {
                 String parameterType = parameter.getType().toString().split(":")[1];//获取参数的类型
-                PsiClass[] parameterClass = PsiShortNamesCache.getInstance(project).getClassesByName(parameterType, GlobalSearchScope.allScope(project));
-                List<PsiField> psiFieldList = Arrays.stream(getTargetClass(parameterClass).getAllFields()).collect(Collectors.toList());
 
-                for (PsiField field : psiFieldList) {
-                    String fieldType = field.getType().toString().replace("PsiType:", "");
-                    String fieldName = field.getName();
-                    String fieldValue = fieldName + fieldType;
-                    paramsString = paramsString + "\n\t\t\tparams.add(\"" + fieldName + "\"," + fieldValue + " + \"\");";
-                    parameterType_NameStringAppend(fieldType, fieldValue);
-                    parameterNameStringAppend(fieldValue);
+                if (parameterType.contains("String") || parameterType.contains("Integer") || parameterType.contains("Long")) {
+                    String parameterName = parameter.getName();
+                    String parameterValue = parameterName + parameterType;
+                    paramsString = paramsString + "\n\t\t\tparams.add(\"" + parameterName + "\"," + parameterValue + " + \"\");";
+
+                } else {
+                    PsiClass[] parameterClass = PsiShortNamesCache.getInstance(project).getClassesByName(parameterType, GlobalSearchScope.allScope(project));
+                    List<PsiField> psiFieldList = Arrays.stream(getTargetClass(parameterClass).getAllFields()).collect(Collectors.toList());
+
+                    for (PsiField field : psiFieldList) {
+                        String fieldType = field.getType().toString().replace("PsiType:", "");
+                        String fieldName = field.getName();
+                        String fieldValue = fieldName + fieldType;
+                        paramsString = paramsString + "\n\t\t\tparams.add(\"" + fieldName + "\"," + fieldValue + " + \"\");";
+                        parameterType_NameStringAppend(fieldType, fieldValue);
+                        parameterNameStringAppend(fieldValue);
+                    }
                 }
             }
             showParams = "                            .params(params)\n";
