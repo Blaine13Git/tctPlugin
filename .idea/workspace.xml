@@ -2,7 +2,37 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="90f9e5c2-232a-4fe0-98ed-3bc62c5372c4" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/tctPlugin.jar" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/TestCaseTemplateGroup.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/TestCaseTemplateGroup.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/actions/BaseTestTemplateAction.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/actions/BaseTestTemplateAction.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/actions/TestCaseTemplateAction.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/actions/TestCaseTemplateAction.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/dialogs/BaseTestTemplateDialog.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/dialogs/BaseTestTemplateDialog.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/dialogs/TestCaseTemplateDialog.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/dialogs/TestCaseTemplateDialog.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/services/BaseTestTemplateOperateService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/services/BaseTestTemplateOperateService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/services/TemplateOperateService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/services/TemplateOperateService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/services/TestCaseTemplateOperateService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/services/TestCaseTemplateOperateService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/swings/DialogFormSwing.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/swings/DialogFormSwing.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/tools/TemplateTools.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/xc/qa/tools/group/tools/TemplateTools.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/.idea/runConfigurations.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/.run/Template Plugin.run.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/resources/META-INF/plugin.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/src/com/xc/qa/tools/group/TestCaseTemplateGroup.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/src/com/xc/qa/tools/group/actions/BaseTestTemplateAction.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/src/com/xc/qa/tools/group/actions/TestCaseTemplateAction.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/src/com/xc/qa/tools/group/dialogs/BaseTestTemplateDialog.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/src/com/xc/qa/tools/group/dialogs/TestCaseTemplateDialog.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/src/com/xc/qa/tools/group/services/BaseTestTemplateOperateService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/src/com/xc/qa/tools/group/services/TemplateOperateService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/src/com/xc/qa/tools/group/services/TestCaseTemplateOperateService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/src/com/xc/qa/tools/group/swings/DialogFormSwing.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/test/tctPlugin/src/com/xc/qa/tools/group/tools/TemplateTools.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +113,7 @@
       <workItem from="1634309497123" duration="17000" />
       <workItem from="1634309526820" duration="1221000" />
       <workItem from="1634624638081" duration="2743000" />
-      <workItem from="1672735434646" duration="593000" />
+      <workItem from="1672735434646" duration="1559000" />
     </task>
     <servers />
   </component>

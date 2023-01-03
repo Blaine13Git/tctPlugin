@@ -24,7 +24,7 @@
 #logs/
 #out/
 ##other
-#/classes/
+/classes/
 #*.log
 #*.gz
 #*.bak
@@ -34,4 +34,4 @@
 #consumer/
 #log.path_IS_UNDEFINED/
 #
-#*.class
+*.class
