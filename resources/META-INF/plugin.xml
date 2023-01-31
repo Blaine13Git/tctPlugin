@@ -1,8 +1,8 @@
 <idea-plugin>
-    <id>com.ggj.qa.plugin.TestCaseTemplate</id>
+    <id>com.qa.xc.plugin.TestCaseTemplate</id>
     <name>TestCaseTemplate</name>
     <version>1.1</version>
-    <vendor email="muyi@gegejia.com" url="http://www.xxxXXX.com">GGJ</vendor>
+    <vendor email="fengchang@xinc818.group" url="https://www.xinxuan.net/">xincheng</vendor>
 
     <description>Generate selected class or method test case template.</description>
 
@@ -23,17 +23,23 @@
 
     <actions>
         <group
-                id="com.ggj.qa.tools.group.TestCaseTemplateGroup"
-                class="com.ggj.qa.tools.group.TestCaseTemplateGroup"
+                id="com.qa.xc.TestCaseTemplateGroup"
+                class="com.qa.xc.TestCaseTemplateGroup"
                 popup="true"
-                text="GGJ Test Tools"
-                description="GGJ QA test case template generate tool">
+                text="XC Test Tools"
+                description="XC QA test case template generate tool">
 
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
 
             <!-- Add your actions here -->
-            <action id="com.ggj.qa.tools.group.actions.TestCaseTemplateAction"
-                    class="com.ggj.qa.tools.group.actions.TestCaseTemplateAction"
+            <action id="com.qa.xc.actions.BaseTestTemplateAction"
+                    class="com.qa.xc.actions.BaseTestTemplateAction"
+                    popup="true"
+                    text="BaseTestTemplateGenerator"
+                    description="Base test template generate tool"/>
+
+            <action id="com.qa.xc.actions.TestCaseTemplateAction"
+                    class="com.qa.xc.actions.TestCaseTemplateAction"
                     popup="true"
                     text="TestCaseTemplateGenerator"
                     description="A test case template generate tool"/>

@@ -4,7 +4,37 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e6d5a9c-728e-485f-b787-e97b08bf433b" name="Changes" comment="" />
+    <list default="true" id="0e6d5a9c-728e-485f-b787-e97b08bf433b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/actions/BaseTestTemplateAction.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/actions/TestCaseTemplateAction.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/dialogs/BaseTestTemplateDialog.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/dialogs/TestCaseTemplateDialog.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/BaseTestTemplateOperateService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TemplateOperateService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TestCaseTemplateOperateService.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/swings/DialogFormSwing.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/tools/TemplateTools.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/actions/BaseTestTemplateAction.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/actions/TestCaseTemplateAction.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/dialogs/BaseTestTemplateDialog.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/dialogs/TestCaseTemplateDialog.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/services/BaseTestTemplateOperateService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/services/TemplateOperateService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/services/TestCaseTemplateOperateService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/swings/DialogFormSwing.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/tools/TemplateTools.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/META-INF/plugin.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/ggj/qa/tools/group/TestCaseTemplateGroup.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/TestCaseTemplateGroup.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/ggj/qa/tools/group/actions/TestCaseTemplateAction.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/ggj/qa/tools/group/services/TemplateOperate.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/META-INF/plugin.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/ggj/qa/tools/group/TestCaseTemplateGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/qa/xc/TestCaseTemplateGroup.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/ggj/qa/tools/group/actions/TestCaseTemplateAction.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/ggj/qa/tools/group/services/TemplateOperate.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tctPlugin.jar" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -60,6 +90,9 @@
     <option name="FILTER_DEBUG" value="true" />
     <option name="CUSTOM_FILTER" />
   </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -71,6 +104,7 @@
     <option name="width" value="1440" />
     <option name="height" value="900" />
   </component>
+  <component name="ProjectId" id="2Kz3jZKHZ6bdUsL6VqSonQ8QZcy" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="1" id="Add" />
   </component>
@@ -131,18 +165,37 @@
       </pane>
     </panes>
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.1749137"
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/xcfc/Work/code/tctPlugin/src/com/qa/xc/services&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.1749137&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/com/qa/xc/services" />
+      <recent name="$PROJECT_DIR$/src/com/qa/xc/dialogs" />
+      <recent name="$PROJECT_DIR$/src/com/qa/xc/actions" />
       <recent name="$PROJECT_DIR$/src/com/ggj/qa/tools/group/services" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.qa.xc.tools" />
+      <recent name="com.qa.xc.swings" />
     </key>
   </component>
   <component name="RunManager" selected="Plugin.Plugin">
@@ -185,12 +238,13 @@
       </list>
     </recent_temporary>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="98ecfff9-e411-4195-9283-cccdc4b6256e" name="Default Changelist" comment="" />
+      <changelist id="0e6d5a9c-728e-485f-b787-e97b08bf433b" name="Changes" comment="" />
       <created>1563451846093</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -228,6 +282,36 @@
       <workItem from="1574135305882" duration="106000" />
       <workItem from="1574135439437" duration="599000" />
       <workItem from="1574926545700" duration="411000" />
+      <workItem from="1674963724437" duration="587000" />
+      <workItem from="1674973689515" duration="2247000" />
+      <workItem from="1674982791486" duration="691000" />
+      <workItem from="1674983518680" duration="417000" />
+      <workItem from="1674983961559" duration="358000" />
+      <workItem from="1674984347101" duration="2435000" />
+      <workItem from="1674986911470" duration="981000" />
+      <workItem from="1674987922164" duration="1356000" />
+      <workItem from="1674989358667" duration="2107000" />
+      <workItem from="1675046274652" duration="1990000" />
+      <workItem from="1675048299636" duration="180000" />
+      <workItem from="1675048504843" duration="3339000" />
+      <workItem from="1675058698035" duration="804000" />
+      <workItem from="1675059525861" duration="270000" />
+      <workItem from="1675059818660" duration="1443000" />
+      <workItem from="1675061286398" duration="365000" />
+      <workItem from="1675061674646" duration="608000" />
+      <workItem from="1675062304350" duration="649000" />
+      <workItem from="1675062992355" duration="463000" />
+      <workItem from="1675063477895" duration="1205000" />
+      <workItem from="1675066210435" duration="2452000" />
+      <workItem from="1675068726018" duration="741000" />
+      <workItem from="1675069487842" duration="5226000" />
+      <workItem from="1675075443119" duration="343000" />
+      <workItem from="1675075807644" duration="233000" />
+      <workItem from="1675076060897" duration="843000" />
+      <workItem from="1675128524284" duration="881000" />
+      <workItem from="1675129426219" duration="629000" />
+      <workItem from="1675130092115" duration="386000" />
+      <workItem from="1675130520604" duration="538000" />
     </task>
     <servers />
   </component>
@@ -304,6 +388,9 @@
       <window_info anchor="right" id="Palette&#9;" order="8" />
       <window_info anchor="right" id="Theme Preview" order="9" />
     </layout-to-restore>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">

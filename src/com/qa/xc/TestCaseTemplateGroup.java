@@ -1,4 +1,4 @@
-package com.ggj.qa.tools.group;
+package com.qa.xc;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
