@@ -28,18 +28,14 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
     private PsiClass psiClass = null;
     private PsiMethod psiMethod = null;
     private String objectName = null;
-
-    private boolean paramsNull = false;
-
     private HashMap<String, Object> data = new HashMap<>();
     private StringBuilder parameterNames = new StringBuilder();
     private StringBuilder parameterNameString = new StringBuilder();
     private StringBuilder parameterType_NameString = new StringBuilder();
     private ArrayList<String> contents = new ArrayList<>();
-
+    boolean isController = false;
     private String baseUrl = "";
     private String methodUrl = "";
-
     private TemplateTools templateTools = new TemplateTools();
 
 
@@ -51,40 +47,36 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      */
     public void generateCaseFile(String filePath, String fileName, PsiElement element, Project project) {
         this.project = project;
-
         String testCaseFileName;
         String className;
         String fullFileName;
 
-        //测试文件名称定义
-        if (element instanceof PsiClass) {
+        if (element instanceof PsiClass) { // 类的处理
             psiClass = (PsiClass) element.getNavigationElement();
-
             List<PsiAnnotation> psiAnnotations = Arrays.stream(psiClass.getAnnotations()).collect(Collectors.toList());
             for (PsiAnnotation psiAnnotation : psiAnnotations) {
                 if (psiAnnotation.getQualifiedName().endsWith("Mapping")) {
+                    isController = true;
                     baseUrl = psiAnnotation.getParameterList().getAttributes()[0].getValue().toString().replace("PsiLiteralExpression:", "").replace("\"", "");
                     if (!baseUrl.startsWith("/")) {
                         baseUrl = "/" + baseUrl;
                     }
                 }
             }
-
             fileName = psiClass.getName();
-        } else if (element instanceof PsiMethod) {
+        } else if (element instanceof PsiMethod) { // 方法的处理
             psiMethod = (PsiMethod) element.getNavigationElement();
-
             PsiClass containingClass = psiMethod.getContainingClass();
             List<PsiAnnotation> psiAnnotations = Arrays.stream(containingClass.getAnnotations()).collect(Collectors.toList());
             for (PsiAnnotation psiAnnotation : psiAnnotations) {
                 if (psiAnnotation.getQualifiedName().endsWith("Mapping")) {
+                    isController = true;
                     baseUrl = psiAnnotation.getParameterList().getAttributes()[0].getValue().toString().replace("PsiLiteralExpression:", "").replace("\"", "");
                     if (!baseUrl.startsWith("/")) {
                         baseUrl = "/" + baseUrl;
                     }
                 }
             }
-
             String psiMethodName = psiMethod.getName();
             fileName = psiMethodName.substring(0, 1).toUpperCase() + psiMethodName.substring(1);
         }
@@ -111,8 +103,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             //写入基本内容
             templateTools.writeContent(fullFileName, "package " + packageName + "\n\n" + importTest);
 
-            if (className.contains("Controller")) {
-                templateTools.writeContent(fullFileName, "public class " + fileName + "Test extends BaseTest {\n" + "\n" + "\t@Autowired\n" + "\tprivate MockMvc mvc;\n\n" + "\t@Autowired\n" + "\tprivate WebApplicationContext webApplicationContext;\n\n" + "\t@Autowired\n" + "\tprivate IamContext iamContext;\n\n" + "\t@Reference\n" + "\tprivate TokenToolsApi tokenToolsApi;\n\n");
+            if (isController) {
+                templateTools.writeContent(fullFileName, "public class " + fileName + "Test extends BaseTest {\n" + "\t@Autowired\n" + "\tprivate MockMvc mvc;\n" + "\t@Autowired\n" + "\tprivate WebApplicationContext webApplicationContext;\n" + "\t@Autowired\n" + "\tprivate IamContext iamContext;\n" + "\t@Reference\n" + "\tprivate TokenToolsApi tokenToolsApi;\n\n");
             } else {
                 templateTools.writeContent(fullFileName, "public class " + fileName + "Test extends BaseTest {\n" + "\n" + "\t@Autowired\n" + "\tprivate " + className + " " + objectName + ";\n\n");
             }
@@ -196,11 +188,6 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
     String requestMethodNameOriginal = "";
 
     public void writeMethodProcessor(String filePath, String fileName, PsiMethod method) {
-//        data = new HashMap<>();
-//        parameterType_NameString = new StringBuilder();
-//        parameterNames = new StringBuilder();
-//        parameterNameString = new StringBuilder();
-//        contents = new ArrayList<>();
 
         parameterType_NameString.append("String caseId,String caseDesc,");
         parameterNameString.append("\t\t// caseId,caseDesc,");
@@ -210,25 +197,17 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         StringBuilder requestMethodParameters = new StringBuilder();
         Arrays.stream(method.getParameters()).forEach(requestMethodParameter -> {
-            String type = requestMethodParameter.getType().toString().replace("PsiType:", "");
-            String type1 = type.replace("<", "");
-            String type2 = type1.replace(">", "");
-            if (type.contains("List<")) {
-                requestMethodParameters.append(requestMethodParameter.getName() + type2 + "s,");
-            } else {
-                requestMethodParameters.append(requestMethodParameter.getName() + type2 + ",");
-            }
+            requestMethodParameters.append(requestMethodParameter.getName() + ",");
         });
 
-        String returnType = method.getReturnType().toString().split(":")[1];
-
         String requestMappingType = getRequestMappingType(method);
+        String returnType = method.getReturnType().toString().split(":")[1];
 
         if (requestMappingType.equals("get") || requestMappingType.equals("post") || requestMappingType.equals("put") || requestMappingType.equals("delete")) {
             String contentCall = "\n\t\t\t" + "String result = JSONObject.toJSONString(mvcResult.getResponse().getContentAsString());";
             contents.add(contentCall);
-        } else {
-            String contentCallTemp = "\n\t\t\t" + returnType + " resultTemp = " + objectName + "." + requestMethodNameOriginal + "(" + requestMethodParameters.toString() + ");";
+        } else {// 调用被测方法
+            String contentCallTemp = "\n\t\t\t" + returnType + " resultTemp = " + objectName + "." + requestMethodNameOriginal + "(" + requestMethodParameters + ");";
             String contentCall = contentCallTemp.replace(",);", ");");
             String resultString = "\n\t\t\t" + "String result = JSONObject.toJSONString(resultTemp);";
             contents.add(contentCall);
@@ -236,13 +215,19 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         }
 
         String methodParameters = (String) data.get("parameters");
-        methodParameters = methodParameters + "Boolean isSuccess";
         String parameterNameString_end = (String) data.get("parameterNameString");
+        methodParameters = methodParameters + "Boolean isSuccess";
         parameterNameString_end = parameterNameString_end + "isSuccess";
         ArrayList<String> contents = (ArrayList<String>) data.get("contents");
 
         // 写入开头
-        String contentMethodStart = "\t@Test(dataProvider = \"CsvDataProvider\")\n" + "\tpublic void " + requestMethodNameOriginal + "CaseOfTest(" + methodParameters + ") {\n" + "\t\tCASE_ID = getCaseId(caseId);\n" + "\t\tmvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).addFilter(new IamFilter(iamContext), \"/*\").build();\n\n" + "\t\ttry {";
+        String contentMethodStart;
+        if (!isController) {
+            contentMethodStart = "\t@Test(dataProvider = \"CsvDataProvider\")\n" + "\tpublic void " + requestMethodNameOriginal + "CaseOfTest(" + methodParameters + ") {\n" + "\t\tCASE_ID = getCaseId(caseId);\n" + "\t\ttry {";
+        } else {
+            contentMethodStart = "\t@Test(dataProvider = \"CsvDataProvider\")\n" + "\tpublic void " + requestMethodNameOriginal + "CaseOfTest(" + methodParameters + ") {\n" + "\t\tCASE_ID = getCaseId(caseId);\n" + "\t\tmvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).addFilter(new IamFilter(iamContext), \"/*\").build();\n\n" + "\t\ttry {";
+        }
+
         templateTools.writeContent(filePath + fileName, contentMethodStart);
 
         // 内容写入
@@ -262,6 +247,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         String csvFilePath = filePath.split("/src/test/java/")[0] + "/src/test/resources/testdata/" + fileName.split(".java")[0] + "/";
         File csvFilePathDir = new File(csvFilePath);
+
         // 判断路径是否存在
         if (!csvFilePathDir.exists()) {
             csvFilePathDir.mkdirs();
@@ -277,7 +263,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      * @param method
      */
     public HashMap<String, Object> getData(PsiMethod method) {
-        JvmParameter[] parameters = method.getParameters();
+        PsiParameter[] parameters = (PsiParameter[]) method.getParameters();
         String requestMappingType = getRequestMappingType(method);
         String requestMethodName = method.getName();
         String mockMvcString = "";
@@ -288,42 +274,40 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         if ("".equals(getRequestMappingType(method))) {
             // 普通接口
-            for (JvmParameter parameter : parameters) {
+            for (PsiParameter parameter : parameters) {
+
                 String parameterType = parameter.getType().toString().split(":")[1];//获取参数的类型
+                String parameterName = parameter.getName();//获取参数的名称
 
-                String parameterType1 = parameterType.replace("<", "");
-                String parameterType2 = parameterType1.replace(">", "");
-                String parameterName = parameter.getName() + parameterType2; //获取参数的名称+类型确认唯一性
-
-                if (parameterType.contains("List<")) {// 范型
+                if (parameterType.contains("List<") || parameterType.contains("ArrayList<")) {
                     String generics = parameterType.split("<")[1].split(">")[0];
-                    if (generics.equals("String") || generics.equals("Long") || generics.equals("Integer")) {
+
+                    if (generics.equals("String") || generics.equals("Long") || generics.equals("Integer")) { // 基础范型对象的处理
                         if (parameterNames.length() != 0) {
                             parameterNames.append(",");
                         }
-
                         // 需要去重
-                        parameterType_NameStringAppend(generics, parameterName);
-                        String parameterName2 = parameterName + "s";
-                        String writeListString = "\t\t\tArrayList<" + generics + "> " + parameterName2 + " = new ArrayList<>();";
-                        String tempData = "\t\t\t" + parameterName2 + ".add(" + parameterName + ");";
+                        parameterType_NameStringAppend(generics, parameterName + generics);
+                        String writeListString = "\t\t\tArrayList<" + generics + "> " + parameterName + " = new ArrayList<>();";
+                        String tempData = "\t\t\t" + parameterName + ".add(" + parameterName + generics + ");";
                         contents.add(writeListString);
                         contents.add(tempData);
-                        parameterNames.append(parameterName);
-                        parameterNameStringAppend(parameterName);
-                    } else {
+                        parameterNames.append(parameterName + generics);
+                        parameterNameStringAppend(parameterName + generics);
+                    } else { // 自定义范型的对象处理
                         if (parameterNames.length() != 0) {
                             parameterNames.append(",");
                         }
-                        // 范型的对象处理
                         String genericsParameterName = generics.substring(0, 1).toLowerCase() + generics.substring(1);
-                        CustomerObjectProcessor(generics, genericsParameterName);
-
+                        customerObjectProcessor(generics, genericsParameterName);
                         // 集合的处理
-                        String parameterName2 = parameterName + "s";
-                        contents.add("\n\t\t\tArrayList<" + generics + "> " + parameterName2 + " = new ArrayList<>();");
-                        contents.add("\t\t\t" + parameterName2 + ".add(" + genericsParameterName + ");");
+                        contents.add("\n\t\t\tArrayList<" + generics + "> " + parameterName + " = new ArrayList<>();");
+                        contents.add("\t\t\t" + parameterName + ".add(" + genericsParameterName + ");");
                     }
+                } else if (parameterType.contains("Map<") || parameterType.contains("HashMap<")) {
+                    parameterName = parameter.getName();
+                    String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + "Hash" + parameterType + "();";
+                    contents.add(writeObjectString);
                 } else if (isBaseDataType(parameterType)) { // 基础数据类型
                     if (parameterNames.length() != 0) {
                         parameterNames.append(",");
@@ -332,6 +316,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                     parameterType_NameStringAppend(parameterType, parameterName);
                     parameterNames.append(parameterName);
                     parameterNameStringAppend(parameterName);
+                } else if (parameterType.toLowerCase().contains("enum")) {
+                    // 不处理
                 } else if (parameterType.equals("Date")) {
                     String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
                     contents.add(writeObjectString);
@@ -345,12 +331,12 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 } else if (parameterType.equals("HttpServletRequest") || parameterType.equals("HttpServletResponse") || parameterType.equals("Model") || parameterType.equals("Map") || parameterType.equals("Set")) {
                     // 暂时不处理的参数类型
                 } else { // 自定义类型
-                    CustomerObjectProcessor(parameterType, parameterName);
+                    customerObjectProcessor(parameterType, parameterName);
                 }
             }
         } else {
             // rest 接口
-            for (JvmParameter parameter : parameters) {
+            for (PsiParameter parameter : parameters) {
                 String parameterType = parameter.getType().toString().split(":")[1];//获取参数的类型
 
                 String parameterType1 = parameterType.replace("<", "");
@@ -362,7 +348,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                     parameterNameStringAppend(parameterName);
                 } else {
                     if (!"RequestParam".equals(getRequestParamType(method))) {
-                        CustomerObjectProcessor(parameterType, parameterName);
+                        customerObjectProcessor(parameterType, parameterName);
                     }
                     if (parameterNameOriginal.equals(parameterName) && ("RequestBody" == getRequestParamType(method)) && (requestMappingType.equals("get") || requestMappingType.equals("post") || requestMappingType.equals("put") || requestMappingType.equals("delete"))) {
                         String jsonParam = "\n\t\t\t" + "String content = JSONObject.toJSONString(" + parameterName + ");\n";
@@ -388,7 +374,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
     int times = 0;
     String parameterNameOriginal = "";
 
-    public void CustomerObjectProcessor(String parameterType, String parameterName) {
+    public void customerObjectProcessor(String parameterType, String parameterName) {
+
 
         if (times < 1) {
             times++;
@@ -397,6 +384,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
         contents.add(writeObjectString);
+
         if (!parameterType.contains("[")) {
             PsiClass[] parameterClass = PsiShortNamesCache.getInstance(project).getClassesByName(parameterType, GlobalSearchScope.allScope(project));
             try {
@@ -404,18 +392,20 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 for (PsiMethod setParameterMethod : setParameterMethods) {
 
                     String setParameterMethodType = setParameterMethod.getParameters()[0].getType().toString().replace("PsiType:", "");
-
-                    String setParameterMethodType1 = setParameterMethodType.replace("<", "");
-                    String setParameterMethodType2 = setParameterMethodType1.replace(">", "");
                     String setParameterMethodName = setParameterMethod.getParameters()[0].getName();
 
-                    if (setParameterMethodType.contains("List<")) {
+                    if (setParameterMethodType.contains("List<") || setParameterMethodType.contains("ArrayList<") || setParameterMethodType.contains("Map<") || setParameterMethodType.contains("HashMap<")) {
                         getData(setParameterMethod); // 调用方法的参数处理的方法
-                        contents.add("\t\t\t" + parameterName + "." + setParameterMethod.getName() + "(" + setParameterMethodName + setParameterMethodType2 + "s);");
+                        contents.add("\t\t\t" + parameterName + "." + setParameterMethod.getName() + "(" + setParameterMethodName + ");");
+                    } else if (setParameterMethodType.toLowerCase().contains("enum")) {
+                        contents.add("\t\t\t" + parameterName + "." + setParameterMethod.getName() + "(" + setParameterMethodType + ");");
                     } else {
-                        JvmParameter[] setMethodParameters = setParameterMethod.getParameters();
+                        PsiParameter[] setMethodParameters = (PsiParameter[]) setParameterMethod.getParameters();
                         String setMethodParameter0Type = setMethodParameters[0].getType().toString().split(":")[1];
                         String setMethodParameter0Name = setMethodParameters[0].getName() + setMethodParameter0Type;
+
+                        String setParameterMethodType1 = setParameterMethodType.replace("<", "");
+                        String setParameterMethodType2 = setParameterMethodType1.replace(">", "");
 
                         if (isBaseDataType(setMethodParameter0Type)) {
                             contents.add("\t\t\t" + parameterName + "." + setParameterMethod.getName() + "(" + setParameterMethodName + setParameterMethodType2 + ");");
@@ -503,19 +493,16 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
 
         if (getRequestParamType(method).equals("RequestParam")) {
             paramsString = "\t\t\tMultiValueMap<String, String> params = new HttpHeaders();";
-            JvmParameter[] parameters = method.getParameters();
-            for (JvmParameter parameter : parameters) {
+            PsiParameter[] parameters = (PsiParameter[]) method.getParameters();
+            for (PsiParameter parameter : parameters) {
                 String parameterType = parameter.getType().toString().split(":")[1];//获取参数的类型
-
                 if (parameterType.contains("String") || parameterType.contains("Integer") || parameterType.contains("Long")) {
                     String parameterName = parameter.getName();
                     String parameterValue = parameterName + parameterType;
                     paramsString = paramsString + "\n\t\t\tparams.add(\"" + parameterName + "\"," + parameterValue + " + \"\");";
-
                 } else {
                     PsiClass[] parameterClass = PsiShortNamesCache.getInstance(project).getClassesByName(parameterType, GlobalSearchScope.allScope(project));
                     List<PsiField> psiFieldList = Arrays.stream(getTargetClass(parameterClass).getAllFields()).collect(Collectors.toList());
-
                     for (PsiField field : psiFieldList) {
                         String fieldType = field.getType().toString().replace("PsiType:", "");
                         String fieldName = field.getName();
@@ -614,20 +601,19 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      */
     private String getRequestParamType(PsiMethod method) {
 
-        JvmParameter[] parameterList = method.getParameters();
-        List<JvmParameter> jvmParameters = Arrays.stream(parameterList).collect(Collectors.toList());
+        PsiParameter[] parameterList = (PsiParameter[]) method.getParameters();
+        List<PsiParameter> jvmParameters = Arrays.stream(parameterList).collect(Collectors.toList());
         if (jvmParameters == null || jvmParameters.size() == 0) {
-            paramsNull = true;
             return "";
         }
 
         for (int i = 0; i < jvmParameters.size(); i++) {
-            JvmAnnotation[] annotations = jvmParameters.get(i).getAnnotations();
+            PsiAnnotation[] annotations = jvmParameters.get(i).getAnnotations();
             if (annotations.length == 0 && getRequestMappingType(method) != "") {
                 return "RequestParam";
             }
 
-            List<JvmAnnotation> jvmAnnotations = Arrays.stream(annotations).collect(Collectors.toList());
+            List<PsiAnnotation> jvmAnnotations = Arrays.stream(annotations).collect(Collectors.toList());
 
             for (int j = 0; j < jvmAnnotations.size(); j++) {
                 if (jvmAnnotations.get(j).getQualifiedName().contains("RequestBody")) {
