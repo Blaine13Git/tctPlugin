@@ -5,35 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e6d5a9c-728e-485f-b787-e97b08bf433b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/actions/BaseTestTemplateAction.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/actions/TestCaseTemplateAction.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/dialogs/BaseTestTemplateDialog.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/dialogs/TestCaseTemplateDialog.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/BaseTestTemplateOperateService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TemplateOperateService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TestCaseTemplateOperateService.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/swings/DialogFormSwing.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/tools/TemplateTools.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/actions/BaseTestTemplateAction.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/actions/TestCaseTemplateAction.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/dialogs/BaseTestTemplateDialog.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/dialogs/TestCaseTemplateDialog.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/services/BaseTestTemplateOperateService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/services/TemplateOperateService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/services/TestCaseTemplateOperateService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/swings/DialogFormSwing.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/qa/xc/tools/TemplateTools.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/ggj/qa/tools/group/TestCaseTemplateGroup.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/TestCaseTemplateGroup.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/ggj/qa/tools/group/actions/TestCaseTemplateAction.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/ggj/qa/tools/group/services/TemplateOperate.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ggj/qa/tools/group/TestCaseTemplateGroup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/qa/xc/TestCaseTemplateGroup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ggj/qa/tools/group/actions/TestCaseTemplateAction.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/ggj/qa/tools/group/services/TemplateOperate.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tctPlugin.jar" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -169,23 +142,23 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/xcfc/Work/code/tctPlugin/src/com/qa/xc/services&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.1749137&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/Users/changfeng/work/code/tctPlugin",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.1749137",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/com/qa/xc/services" />
@@ -312,6 +285,8 @@
       <workItem from="1675129426219" duration="629000" />
       <workItem from="1675130092115" duration="386000" />
       <workItem from="1675130520604" duration="538000" />
+      <workItem from="1676616613632" duration="2347000" />
+      <workItem from="1676622728860" duration="176000" />
     </task>
     <servers />
   </component>
