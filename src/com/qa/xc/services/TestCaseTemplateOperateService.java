@@ -280,6 +280,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 String parameterName = parameter.getName();//获取参数的名称
 
                 if (parameterType.contains("List<") || parameterType.contains("ArrayList<")) {
+
                     String generics = parameterType.split("<")[1].split(">")[0];
 
                     if (generics.equals("String") || generics.equals("Long") || generics.equals("Integer")) { // 基础范型对象的处理
@@ -306,8 +307,39 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                     }
                 } else if (parameterType.contains("Map<") || parameterType.contains("HashMap<")) {
                     parameterName = parameter.getName();
-                    String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + "Hash" + parameterType + "();";
+                    String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + "HashMap<>" + "();";
                     contents.add(writeObjectString);
+                } else if (parameterType.contains("Set<") || parameterType.contains("HashSet<")) {
+                    String generics = parameterType.split("<")[1].split(">")[0];
+
+                    if (generics.equals("String") || generics.equals("Long") || generics.equals("Integer") || generics.toLowerCase().contains("enum")) { // 基础范型对象的处理
+                        if (parameterNames.length() != 0) {
+                            parameterNames.append(",");
+                        }
+                        // 需要去重
+                        parameterType_NameStringAppend(generics, parameterName + generics);
+                        String newObjectName = parameterName + (parameterType.replace("<", "")).replace(">", "");
+                        String writeListString = "\t\t\tSet<" + generics + "> " + newObjectName + " = new HashSet<>();";
+                        String tempData;
+                        if (generics.toLowerCase().contains("enum")) {
+                            tempData = "\t\t\t" + newObjectName + ".add(" + generics + ");";
+                        } else {
+                            tempData = "\t\t\t" + newObjectName + ".add(" + parameterName + generics + ");";
+                        }
+                        contents.add(writeListString);
+                        contents.add(tempData);
+                        parameterNames.append(parameterName + generics);
+                        parameterNameStringAppend(parameterName + generics);
+                    } else { // 自定义范型的对象处理
+                        if (parameterNames.length() != 0) {
+                            parameterNames.append(",");
+                        }
+                        String genericsParameterName = generics.substring(0, 1).toLowerCase() + generics.substring(1);
+                        customerObjectProcessor(generics, genericsParameterName);
+                        // 集合的处理
+                        contents.add("\n\t\t\tSet<" + generics + "> " + parameterName + " = new HashSet<>();");
+                        contents.add("\t\t\t" + parameterName + ".add(" + genericsParameterName + ");");
+                    }
                 } else if (isBaseDataType(parameterType)) { // 基础数据类型
                     if (parameterNames.length() != 0) {
                         parameterNames.append(",");
@@ -319,14 +351,14 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 } else if (parameterType.toLowerCase().contains("enum")) {
                     // 不处理
                 } else if (parameterType.equals("Date")) {
-                    String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "();";
+                    String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + parameterType + " = new " + parameterType + "();";
                     contents.add(writeObjectString);
                 } else if (parameterType.equals("BigDecimal")) {
                     contents.add("\t\t\t// BigDecimal 类型需要自己给一个String类型参数");
-                    String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = new " + parameterType + "(818);";
+                    String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + parameterType + " = new " + parameterType + "(818);";
                     contents.add(writeObjectString);
                 } else if (parameterType.equals("LocalDateTime")) {
-                    String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + " = " + parameterType + ".now();";
+                    String writeObjectString = "\t\t\t" + parameterType + " " + parameterName + parameterType + " = " + parameterType + ".now();";
                     contents.add(writeObjectString);
                 } else if (parameterType.equals("HttpServletRequest") || parameterType.equals("HttpServletResponse") || parameterType.equals("Model") || parameterType.equals("Map") || parameterType.equals("Set")) {
                     // 暂时不处理的参数类型
@@ -375,8 +407,6 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
     String parameterNameOriginal = "";
 
     public void customerObjectProcessor(String parameterType, String parameterName) {
-
-
         if (times < 1) {
             times++;
             parameterNameOriginal = parameterName;
@@ -397,7 +427,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                     if (setParameterMethodType.contains("List<") || setParameterMethodType.contains("ArrayList<") || setParameterMethodType.contains("Map<") || setParameterMethodType.contains("HashMap<")) {
                         getData(setParameterMethod); // 调用方法的参数处理的方法
                         contents.add("\t\t\t" + parameterName + "." + setParameterMethod.getName() + "(" + setParameterMethodName + ");");
-                    } else if (setParameterMethodType.toLowerCase().contains("enum")) {
+                    } else if (setParameterMethodType.toLowerCase().contains("enum") && !setParameterMethodType.contains("<")) {
                         contents.add("\t\t\t" + parameterName + "." + setParameterMethod.getName() + "(" + setParameterMethodType + ");");
                     } else {
                         PsiParameter[] setMethodParameters = (PsiParameter[]) setParameterMethod.getParameters();
