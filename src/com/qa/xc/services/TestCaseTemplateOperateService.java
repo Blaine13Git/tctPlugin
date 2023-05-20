@@ -1,13 +1,10 @@
 package com.qa.xc.services;
 
-import com.intellij.lang.jvm.JvmAnnotation;
-import com.intellij.lang.jvm.JvmParameter;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiShortNamesCache;
 import com.qa.xc.tools.TemplateTools;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -51,35 +48,34 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         String className;
         String fullFileName;
 
-        if (element instanceof PsiClass) { // 类的处理
+        // 类的处理
+        if (element instanceof PsiClass) {
             psiClass = (PsiClass) element.getNavigationElement();
-            List<PsiAnnotation> psiAnnotations = Arrays.stream(psiClass.getAnnotations()).collect(Collectors.toList());
-            for (PsiAnnotation psiAnnotation : psiAnnotations) {
-                if (psiAnnotation.getQualifiedName().endsWith("Mapping")) {
-                    isController = true;
-                    baseUrl = psiAnnotation.getParameterList().getAttributes()[0].getValue().toString().replace("PsiLiteralExpression:", "").replace("\"", "");
-                    if (!baseUrl.startsWith("/")) {
-                        baseUrl = "/" + baseUrl;
-                    }
-                }
-            }
             fileName = psiClass.getName();
-        } else if (element instanceof PsiMethod) { // 方法的处理
+        }
+
+        // 方法的处理
+        if (element instanceof PsiMethod) {
             psiMethod = (PsiMethod) element.getNavigationElement();
-            PsiClass containingClass = psiMethod.getContainingClass();
-            List<PsiAnnotation> psiAnnotations = Arrays.stream(containingClass.getAnnotations()).collect(Collectors.toList());
-            for (PsiAnnotation psiAnnotation : psiAnnotations) {
-                if (psiAnnotation.getQualifiedName().endsWith("Mapping")) {
-                    isController = true;
-                    baseUrl = psiAnnotation.getParameterList().getAttributes()[0].getValue().toString().replace("PsiLiteralExpression:", "").replace("\"", "");
-                    if (!baseUrl.startsWith("/")) {
-                        baseUrl = "/" + baseUrl;
-                    }
-                }
-            }
+            psiClass = psiMethod.getContainingClass();
             String psiMethodName = psiMethod.getName();
             fileName = psiMethodName.substring(0, 1).toUpperCase() + psiMethodName.substring(1);
         }
+
+        // 获取 baseUrl
+        List<PsiAnnotation> psiClassAnnotations = Arrays.stream(psiClass.getAnnotations()).collect(Collectors.toList());
+        for (PsiAnnotation psiAnnotation : psiClassAnnotations) {
+            if (psiAnnotation.getQualifiedName().endsWith("RestController")) {
+                isController = true;
+            }
+            if (psiAnnotation.getQualifiedName().endsWith("Mapping")) {
+                baseUrl = psiAnnotation.getParameterList().getAttributes()[0].getValue().toString().replace("PsiLiteralExpression:", "").replace("\"", "");
+                if (!baseUrl.startsWith("/")) {
+                    baseUrl = "/" + baseUrl;
+                }
+            }
+        }
+
         testCaseFileName = fileName + "Test.java";
         File testFilePath = new File(filePath);
 
@@ -171,7 +167,6 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            templateTools.writeContent(fullFileName, "Exception >>> " + e.getMessage());
         } finally {
             //写入类结尾
             templateTools.writeContent(fullFileName, "}");
@@ -630,7 +625,6 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      * @return
      */
     private String getRequestParamType(PsiMethod method) {
-
         PsiParameter[] parameterList = (PsiParameter[]) method.getParameters();
         List<PsiParameter> jvmParameters = Arrays.stream(parameterList).collect(Collectors.toList());
         if (jvmParameters == null || jvmParameters.size() == 0) {

@@ -4,11 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e6d5a9c-728e-485f-b787-e97b08bf433b" name="Changes" comment="">
+    <list default="true" id="0e6d5a9c-728e-485f-b787-e97b08bf433b" name="Changes" comment="add set">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TestCaseTemplateOperateService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TestCaseTemplateOperateService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/qa/xc/services/TestCaseTemplateOperateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/qa/xc/services/TestCaseTemplateOperateService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tctPlugin.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tctPlugin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/tctPlugin.jar" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,6 +38,11 @@
     </findStrings>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="OK" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
@@ -303,6 +308,7 @@
       <workItem from="1678262946950" duration="174000" />
       <workItem from="1678263130074" duration="386000" />
       <workItem from="1678263524927" duration="1383000" />
+      <workItem from="1684566305627" duration="279000" />
     </task>
     <servers />
   </component>
@@ -388,7 +394,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="test" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
