@@ -16,22 +16,23 @@ public class BaseTestTemplateOperateService implements TemplateOperateService {
         TemplateTools templateTools = new TemplateTools();
         File testFilePath = new File(filePath);
 
-        //判断路径是否存在
+        // 判断路径是否存在
         if (!testFilePath.exists()) {
             testFilePath.mkdirs();
         }
 
-        //创建文件
+        // 创建文件
         String fullFileName = filePath + fileName;
         File file = new File(fullFileName);
 
-        //生成文件和基本信息
+        // 生成文件和基本信息
         if (!file.exists()) {
 
             String packageNameTemp = filePath.split("/src/test/java/")[1].replace("/", ".") + ";";
             String packageName = packageNameTemp.substring(0, packageNameTemp.length() - 2) + ";";
 
-            String importString = "import com.xinc818.qa.qats4testng.dataprovider.DataDriver;\n" +
+            String importDependency = "\n" +
+                    "import com.xinc818.qa.qats4testng.dataprovider.DataDriver;\n" +
                     "import com.xinc818.qa.qats4testng.report.ConfigReport;\n" +
                     "import org.apache.commons.lang.StringUtils;\n" +
                     "import org.springframework.boot.test.context.SpringBootTest;\n" +
@@ -40,21 +41,25 @@ public class BaseTestTemplateOperateService implements TemplateOperateService {
                     "\n" +
                     "@SpringBootTest(classes = xxxApplication.class)\n" +
                     "@AutoConfigureMockMvc\n" +
-                    "@Listeners({ConfigReport.class})";
+                    "@Listeners({ConfigReport.class})\n";
 
-            String content = "static {\n" +
-                    "        System.setProperty(\"app.name\", \"" + project.getName() + "\");\n" +
-                    "    }\n" +
+            String content = "" +
+                    "\tstatic {\n" +
+                    "\t\tSystem.setProperty(\"app.name\", \"" + project.getName() + "\");\n" +
+                    "\t}\n" +
                     "\n" +
-                    "    public int CASE_ID;\n" +
+                    "\tpublic int CASE_ID;\n" +
                     "\n" +
-                    "    public static int getCaseId(String caseId) {\n" +
-                    "        return Integer.valueOf(StringUtils.substring(caseId, caseId.length() - 2, caseId.length()));\n" +
-                    "    }";
+                    "\tpublic static int getCaseId(String caseId) {\n" +
+                    "\t\treturn Integer.valueOf(StringUtils.substring(caseId, caseId.length() - 2, caseId.length()));\n" +
+                    "\t}\n";
 
-            //写入基本内容
-            templateTools.writeContent(fullFileName, "package " + packageName + "\n\n" + importString);
-            templateTools.writeContent(fullFileName, "public class " + fileName.replace(".java", "") + " extends DataDriver {\n\n\t" + content + "\n}");
+            // 写入基本内容
+            templateTools.writeContent(fullFileName, "package " + packageName + "\n\n" + importDependency);
+            templateTools.writeContent(fullFileName, "public class " + fileName.replace(".java", "") + " extends DataDriver {\n" +
+                    "\n" +
+                    content +
+                    "}");
 
         } else {
             // 待优化--显示到对话框中
