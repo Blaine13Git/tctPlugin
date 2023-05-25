@@ -12,7 +12,8 @@ import java.io.File;
  */
 public class BaseTestTemplateOperateService implements TemplateOperateService {
 
-    public void generateBaseTestFile(String filePath, String fileName, PsiElement element, Project project) {
+    public String generateFile(String filePath, String fileName, PsiElement element, Project project) {
+        String resultText = "";
         TemplateTools templateTools = new TemplateTools();
         File testFilePath = new File(filePath);
 
@@ -60,12 +61,11 @@ public class BaseTestTemplateOperateService implements TemplateOperateService {
                     "\n" +
                     content +
                     "}");
-
+            resultText = "BaseTest文件模版生成完成！";
         } else {
             // 待优化--显示到对话框中
-            System.out.println("文件已经存在！");
-            System.out.println(file.getAbsolutePath());
+            resultText = "文件已经存在！\n" + file.getAbsolutePath();
         }
-
+        return resultText;
     }
 }

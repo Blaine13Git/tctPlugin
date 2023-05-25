@@ -61,20 +61,26 @@ public class DialogFormSwing {
 
         // 按钮事件绑定
         submit.addActionListener(e -> {
-            //获取输入的路径
+            String resultText = "";
+            // 获取输入的路径
             directory = directoryContent.getText() + "/";
-            try {
-                if ("BaseTest".equals(fileName)) {
-                    // 调用BaseTest模版生成的方法
-                    new BaseTestTemplateOperateService().generateBaseTestFile(directory, fileName + ".java", element, project);
-                } else {
-                    // 调用TestCase模版生成的方法
-                    new TestCaseTemplateOperateService().generateCaseFile(directory, fileName + "Test.java", element, project);
+            if (!directory.contains("/src/test/java/") || directory.isEmpty()) {
+                resultText = "用例模板生成失败！请检查输出文件路径";
+                result.setText(resultText);
+            } else {
+                try {
+                    if ("BaseTest".equals(fileName)) {
+                        // 调用BaseTest模版生成的方法
+                        resultText = new BaseTestTemplateOperateService().generateFile(directory, fileName + ".java", element, project);
+                    } else {
+                        // 调用TestCase模版生成的方法
+                        resultText = new TestCaseTemplateOperateService().generateFile(directory, fileName + "Test.java", element, project);
+                    }
+                    result.setText(resultText);
+                } catch (Exception exception) {
+                    result.setText("用例模板生成失败！请手动搞定吧！");
+                    exception.printStackTrace();
                 }
-                result.setText("Succeed");
-            } catch (Exception exception) {
-                result.setText("Failed");
-                exception.printStackTrace();
             }
         });
 

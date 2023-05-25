@@ -4,14 +4,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e6d5a9c-728e-485f-b787-e97b08bf433b" name="Changes" comment="删除异常的输出">
+    <list default="true" id="0e6d5a9c-728e-485f-b787-e97b08bf433b" name="Changes" comment="getMapping处理">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/META-INF/plugin.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/BaseTestTemplateOperateService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/BaseTestTemplateOperateService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TemplateOperateService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TemplateOperateService.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TestCaseTemplateOperateService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TestCaseTemplateOperateService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/tools/TemplateTools.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/tools/TemplateTools.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/swings/DialogFormSwing.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/swings/DialogFormSwing.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/META-INF/plugin.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/qa/xc/services/BaseTestTemplateOperateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/qa/xc/services/BaseTestTemplateOperateService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/qa/xc/services/TemplateOperateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/qa/xc/services/TemplateOperateService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/qa/xc/services/TestCaseTemplateOperateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/qa/xc/services/TestCaseTemplateOperateService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/qa/xc/tools/TemplateTools.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/qa/xc/tools/TemplateTools.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/com/qa/xc/swings/DialogFormSwing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/qa/xc/swings/DialogFormSwing.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tctPlugin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/tctPlugin.jar" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -319,7 +323,12 @@
       <workItem from="1684572783260" duration="220000" />
       <workItem from="1684573362137" duration="388000" />
       <workItem from="1684573757303" duration="386000" />
-      <workItem from="1684574149838" duration="1196000" />
+      <workItem from="1684574149838" duration="16128000" />
+      <workItem from="1684909859471" duration="5080000" />
+      <workItem from="1684920393932" duration="805000" />
+      <workItem from="1684921210802" duration="952000" />
+      <workItem from="1684922469049" duration="1426000" />
+      <workItem from="1684924136728" duration="1196000" />
     </task>
     <task id="LOCAL-00001" summary="删除异常的输出">
       <created>1684566665019</created>
@@ -328,7 +337,14 @@
       <option name="project" value="LOCAL" />
       <updated>1684566665019</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="getMapping处理">
+      <created>1684576944597</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1684576944597</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
@@ -447,7 +463,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="删除异常的输出" />
-    <option name="LAST_COMMIT_MESSAGE" value="删除异常的输出" />
+    <MESSAGE value="getMapping处理" />
+    <option name="LAST_COMMIT_MESSAGE" value="getMapping处理" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/com/ggj/qa/tools/TestCaseTemplate.java" />

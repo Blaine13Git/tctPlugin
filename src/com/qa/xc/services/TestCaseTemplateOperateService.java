@@ -24,15 +24,15 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
     private PsiClass psiClass = null;
     private PsiMethod psiMethod = null;
     private String objectName = null;
+    boolean isController = false;
+    private String baseUrl = "";
+    private String methodUrl = "";
     private HashMap<String, Object> data = new HashMap<>();
     private StringBuilder parameterNames = new StringBuilder();
     private StringBuilder parameterNameString = new StringBuilder();
     private StringBuilder parameterType_NameString = new StringBuilder();
     private ArrayList<String> contents = new ArrayList<>();
     private TemplateTools templateTools = new TemplateTools();
-    boolean isController = false;
-    private String baseUrl = "";
-    private String methodUrl = "";
 
 
     /**
@@ -41,7 +41,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
      * @param element，选中的元素
      * @author 慕一
      */
-    public void generateCaseFile(String filePath, String fileName, PsiElement element, Project project) {
+    public String generateFile(String filePath, String fileName, PsiElement element, Project project) {
+        String resultText = "";
         this.project = project;
         String testCaseFileName;
         String className;
@@ -50,7 +51,9 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         // 类的处理-获取类 psiClass
         if (element instanceof PsiClass) {
             psiClass = (PsiClass) element.getNavigationElement();
-            fileName = psiClass.getName();
+//            fileName = psiClass.getName();
+            resultText = "暂不支持使用类名批量生成，请选取被测方法名称";
+            return resultText;
         }
 
         // 方法的处理-获取类 psiClass
@@ -151,7 +154,11 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             if (psiMethod != null) {
                 writeTestCase(filePath, testCaseFileName, psiMethod, className);
             }
+            resultText = "模版生成完成！";
+        } else {
+            resultText = "文件已经存在！\n" + file.getAbsolutePath();
         }
+        return resultText;
     }
 
 
@@ -213,12 +220,12 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         String returnType = method.getReturnType().toString().split(":")[1];
 
         if (requestMappingType.equals("get") || requestMappingType.equals("post") || requestMappingType.equals("put") || requestMappingType.equals("delete")) {
-            String contentCall = "\t\t\t" + "String result = JSONObject.toJSONString(mvcResult.getResponse().getContentAsString());\n";
+            String contentCall = "\n\t\t\tString result = JSONObject.toJSONString(mvcResult.getResponse().getContentAsString());\n";
             contents.add(contentCall);
         } else {// 调用被测方法
             String contentCallTemp = "\t\t\t" + returnType + " resultTemp = " + objectName + "." + requestMethodNameOriginal + "(" + requestMethodParameters + ");\n";
             String contentCall = contentCallTemp.replace(",);", ");");
-            String resultString = "\t\t\t" + "String result = JSONObject.toJSONString(resultTemp);\n";
+            String resultString = "\n\t\t\tString result = JSONObject.toJSONString(resultTemp);\n";
             contents.add(contentCall);
             contents.add(resultString);
         }
@@ -548,7 +555,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         }
 
         if (getRequestParamType(method).equals("RequestParam") || getRequestMappingType(method).equals("get")) {
-            paramsString = "\t\t\tMultiValueMap<String, String> params = new HttpHeaders();\n";
+            paramsString = "\t\t\tMultiValueMap<String, String> params = new LinkedMultiValueMap<>();\n";
             PsiParameter[] parameters = (PsiParameter[]) method.getParameters();
             for (PsiParameter parameter : parameters) {
                 String parameterType = parameter.getType().toString().split(":")[1];//获取参数的类型
@@ -573,6 +580,7 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
             showParams = "\t\t\t\t\t\t\t.params(params)\n";
         }
 
+        String projectName = project.getName();
         String writeObjectString = "\n" +
                 "\t\t\tHttpHeaders headers = new HttpHeaders();\n" +
                 "\t\t\theaders.setContentType(MediaType.APPLICATION_JSON);\n" +
@@ -581,7 +589,8 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
                 "\n" +
                 paramsString +
                 "\t\t\tMvcResult mvcResult = mvc.perform(\n" +
-                "\t\t\t\t\t" + requestMappingType + "(\"" + baseUrl + methodUrl + "\")\n" +
+                "\t\t\t\t\t" + requestMappingType + "(\"" + "/" + projectName + baseUrl + methodUrl + "\")\n" +
+                "\t\t\t\t\t\t\t.contextPath(\"" + "/" + projectName + "\")\n" +
                 "\t\t\t\t\t\t\t.headers(headers)\n" + showParams + showContent +
                 "\t\t\t).andReturn();\n";
         return writeObjectString;
