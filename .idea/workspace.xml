@@ -5,18 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0e6d5a9c-728e-485f-b787-e97b08bf433b" name="Changes" comment="getMapping处理">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/BaseTestTemplateOperateService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/BaseTestTemplateOperateService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TemplateOperateService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TemplateOperateService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TestCaseTemplateOperateService.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/services/TestCaseTemplateOperateService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/swings/DialogFormSwing.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/tctPlugin/com/qa/xc/swings/DialogFormSwing.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/META-INF/plugin.xml" beforeDir="false" afterPath="$PROJECT_DIR$/resources/META-INF/plugin.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/qa/xc/services/BaseTestTemplateOperateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/qa/xc/services/BaseTestTemplateOperateService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/qa/xc/services/TemplateOperateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/qa/xc/services/TemplateOperateService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/qa/xc/services/TestCaseTemplateOperateService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/qa/xc/services/TestCaseTemplateOperateService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/qa/xc/swings/DialogFormSwing.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/qa/xc/swings/DialogFormSwing.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tctPlugin.jar" beforeDir="false" afterPath="$PROJECT_DIR$/tctPlugin.jar" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

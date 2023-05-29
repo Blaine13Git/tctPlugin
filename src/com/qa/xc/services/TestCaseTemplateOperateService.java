@@ -490,12 +490,23 @@ public class TestCaseTemplateOperateService implements TemplateOperateService {
         parameterNames.append(parameterName);
     }
 
+    /**
+     * caseId,caseDesc,
+     *
+     * @param parameterName
+     */
     private void parameterNameStringAppend(String parameterName) {
         if (!parameterNameString.toString().contains(parameterName)) {
             parameterNameString.append(parameterName + ",");
         }
     }
 
+    /**
+     * String caseId,String caseDesc,
+     *
+     * @param parameterType
+     * @param parameterName
+     */
     private void parameterType_NameStringAppend(String parameterType, String parameterName) {
         String needAppendData = parameterType + " " + parameterName + ",";
         if (!parameterType_NameString.toString().contains(needAppendData)) {
